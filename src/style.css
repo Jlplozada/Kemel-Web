@@ -1,0 +1,13 @@
+@import "./components/components/paleta.css";
+@import "./components/components.css";
+
+
+body {
+  font-family: var(--font-family);
+  background: var(--primer-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+}
+
+/* Puedes agregar aquí estilos globales adicionales si lo necesitas */

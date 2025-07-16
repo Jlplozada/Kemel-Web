@@ -1,0 +1,194 @@
+/*
+  Barra de navegación principal, fija en la parte superior, con fondo y sombra.
+  Usa grid para organizar el logo y el menú.
+*/
+.header {
+  background-color: var(--segundo-color);
+  color: var(--text2-color);
+  padding: 5px 32px; 
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  position: fixed;  
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;        
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/*
+  Añade espacio arriba para que el contenido no quede oculto bajo el header fijo.
+*/
+body {
+  padding-top: 60px;
+}
+
+/*
+  Menú de navegación: muestra los enlaces en una fila y los alinea a la derecha.
+*/
+.nav-menu {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 20px;
+  justify-content: end;
+  padding-right: 16px; 
+}
+
+/*
+  Estilo de los enlaces del menú: color, sin subrayado, animación de subrayado al hover.
+*/
+.nav-menu a {
+  color: var(--text2-color);
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s;
+}
+
+/*
+  Línea animada que aparece debajo del enlace al hacer hover.
+*/
+.nav-menu a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0;
+  height: 2px;
+  background: var(--primer-color);
+  transition: width 0.3s;
+}
+
+/*
+  Cambia el color del enlace al pasar el mouse o enfocar.
+*/
+.nav-menu a:hover,
+.nav-menu a:focus {
+  color: var(--primer-color);
+}
+
+/*
+  Anima la línea debajo del enlace al hacer hover o focus.
+*/
+.nav-menu a:hover::after,
+.nav-menu a:focus::after {
+  width: 100%;
+}
+
+/*
+  Contenedor del logo, lo alinea verticalmente.
+*/
+.nav-logo {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/*
+  Ajusta el tamaño del logo.
+*/
+.nav-logo img {
+  display: block;
+  width: 20vh;
+  max-height: 10vh;
+}
+/*
+  Estilos responsivos para móviles (pantallas <= 600px):
+  - El header se adapta a una sola columna y centra el contenido.
+  - El logo y menú cambian de tamaño y disposición.
+*/
+@media (max-width: 600px) {
+  .header {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .nav-logo {
+    justify-self: center;
+    margin-bottom: 10px;
+  }
+
+  .nav-logo img {
+    width: 56px;
+    max-height: 56px;
+  }
+
+  .nav-menu {
+    grid-auto-flow: row;
+    gap: 10px;
+    justify-content: center;
+  }
+}
+
+/*
+  Botón de menú hamburguesa, oculto en escritorio, visible en móvil.
+*/
+.menu-hamburguesa {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+  Tamaño de los íconos del botón hamburguesa.
+*/
+.menu-hamburguesa img,
+.menu-hamburguesa svg {
+  width: 32px;
+  height: 32px;
+}
+
+@media (max-width: 600px) {
+  .nav-menu {
+    display: none;
+    position: fixed;
+    top: 60px; 
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 60px);
+    background: var(--segundo-color);
+    flex-direction: column;
+    justify-content: flex-start;   
+    align-items: stretch;        
+    gap: 0;
+    z-index: 2000;
+    box-shadow: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(.4,0,.2,1);
+  }
+  .nav-menu.activo {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .nav-menu a {
+    font-size: 2em;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: none;
+    width: 100%;
+    text-align: center;
+    transition: background 0.2s;
+  }
+  .nav-menu a:last-child {
+    border-bottom: none;
+  }
+  .nav-menu a:hover {
+    background: rgba(255,255,255,0.07);
+  }
+  .menu-hamburguesa {
+    display: flex;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 2100;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+}
