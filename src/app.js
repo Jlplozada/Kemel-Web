@@ -1,9 +1,11 @@
 import "./style.css";
 import { Autenticado, getData } from "./helpers/auth.js";
+import { API_URL } from "./helpers/api.js";
 import { header } from "./components/header/header.js";
 import { headerAdministrador } from "./components/header/headerAdministrador.js";
 import { headerPanadero } from "./components/header/headerPanadero.js";
 import { router } from "./router/router.js";
+import { footer } from "./components/footer/footer.js";
 // Importa aquí otros componentes o helpers si los necesitas
 
 // Obtener datos del usuario autenticado
@@ -45,7 +47,7 @@ if (subir_crear && !Autenticado()) {
 let perfilData = null;
 if (accessToken) {
   try {
-    const responsePerfil = await fetch(`http://localhost:3000/api/usuarios/perfil`, {
+    const responsePerfil = await fetch(`${API_URL}/api/usuarios/perfil`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
@@ -73,4 +75,8 @@ window.addEventListener('hashchange', () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     router(app);
+    // Renderizar footer solo una vez
+    if (!document.querySelector('footer.footer')) {
+        document.body.appendChild(footer());
+    }
 });

@@ -3,19 +3,19 @@ import { Autenticado } from "../helpers/auth.js";
 import { loadView } from "../helpers/loadView";
 // Importa aquí tus controladores según la estructura de tu proyecto
 // Ejemplo:
-// import { inicioController } from "../views/inicio/controllers/inicioController.js";
+import { inicioControlador } from "../views/inicio/inicioControlador.js";
 // import { productosController } from "../views/productos/controllers/productosController.js";
 // ...
 
 const routes = {
     "": {
-        template: "inicio/index.html",
-        controlador: window.inicioController, // Cambia por el import real si lo tienes
+        template: "inicio/inicio.html",
+        controlador: inicioControlador,
         private: false,
     },
     inicio: {
-        template: "inicio/index.html",
-        controlador: window.inicioController,
+        template: "inicio/inicio.html",
+        controlador: inicioControlador,
         private: false,
     },
     productos: {
@@ -54,8 +54,9 @@ const routes = {
 
 // Función principal del router
 export const router = async (app) => {
-    const hash = location.hash.slice(1); // Quita el # de la URL
-    const [rutas, params] = matchRoute(hash); // Busca la ruta y extrae parámetros
+    // Usar pathname en vez de hash
+    const path = location.pathname.replace(/^\//, ''); // Quita el / inicial
+    const [rutas, params] = matchRoute(path); // Busca la ruta y extrae parámetros
 
     if (!rutas) {
         // Si la ruta no existe, redirige a inicio
@@ -106,10 +107,17 @@ const matchRoute = (hash) => {
 
 // Navegación SPA: cambia el hash y dispara el router
 export function navigate(ruta) {
-    if (location.hash !== `#${ruta}`) {
-        location.hash = `#${ruta}`;
+    const newPath = `/${ruta}`;
+    if (location.pathname !== newPath) {
+        history.pushState({}, '', newPath);
+        router(document.querySelector('#app'));
     } else {
         // Si ya estamos en la ruta, forzar recarga del router
-        window.dispatchEvent(new HashChangeEvent('hashchange'));
+        router(document.querySelector('#app'));
     }
 }
+
+// Escucha el evento popstate para navegación con botones del navegador
+window.addEventListener('popstate', () => {
+    router(document.querySelector('#app'));
+});

@@ -1,6 +1,6 @@
 @import "./components/components/paleta.css";
 @import "./components/components.css";
-
+@import "./views/views.css";
 
 body {
   font-family: var(--font-family);

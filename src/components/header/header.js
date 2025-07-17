@@ -12,7 +12,6 @@ export const header = () => {
 
     const inicio = document.createElement('a');
     const catalogo = document.createElement('a');
-    const carrito = document.createElement('a');
     const cuenta = document.createElement('a');
 
     logo.src = '../public/kemel.png';
@@ -23,7 +22,6 @@ export const header = () => {
 
     inicio.textContent = 'Inicio';
     catalogo.textContent = 'Catálogo';
-    carrito.textContent = 'Carrito';
     cuenta.textContent = 'Cuenta';
 
     inicio.setAttribute("href", '#inicio');
@@ -35,7 +33,6 @@ export const header = () => {
 
     divMenu.appendChild(inicio);
     divMenu.appendChild(catalogo);
-    divMenu.appendChild(carrito);
     divMenu.appendChild(cuenta);
     divLogo.appendChild(logoApi); 
 
@@ -49,7 +46,7 @@ export const header = () => {
     });
 
     // Interceptar el click para usar el router SPA
-    [ inicio, catalogo, carrito, cuenta ].forEach(link => {
+    [ inicio, catalogo, cuenta ].forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         divMenu.classList.remove('activo');
