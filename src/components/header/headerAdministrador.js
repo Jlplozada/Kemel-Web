@@ -11,33 +11,66 @@ export const headerAdministrador = () => {
     const menuIcon = document.createElement('img');
 
     // Botones de navegación
+    const administrarProductos = document.createElement('a');
+    const crearProducto = document.createElement('a');
+    const usuarios = document.createElement('a');
     const pedidos = document.createElement('a');
-    const clientes = document.createElement('a');
-    const productos = document.createElement('a');
     const cerrarSesion = document.createElement('a');
 
     logo.src = '../public/kemel.png';
     logo.alt = 'Logo Kemel';
 
-    logoApi.href = '#administrador';
+    logoApi.href = '#/inicio';
     logoApi.appendChild(logo);
 
+    administrarProductos.textContent = 'Administrar Productos';
+    crearProducto.textContent = 'Crear Producto';
+    usuarios.textContent = 'Usuarios';
     pedidos.textContent = 'Pedidos';
-    clientes.textContent = 'Clientes';
-    productos.textContent = 'Productos';
     cerrarSesion.textContent = 'Cerrar sesión';
 
-    pedidos.setAttribute('href', '#pedidos');
-    clientes.setAttribute('href', '#clientes');
-    productos.setAttribute('href', '#productos');
-    cerrarSesion.setAttribute('href', '#login');
+    administrarProductos.setAttribute('href', '#/administrar-productos');
+    crearProducto.setAttribute('href', '#/crear-producto');
+    usuarios.setAttribute('href', '#/usuarios');
+    pedidos.setAttribute('href', '#/pedidos');
+    cerrarSesion.setAttribute('href', '#/login');
+
+    // Event listeners para navegación
+    administrarProductos.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate('/administrar-productos');
+    });
+
+    crearProducto.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate('/crear-producto');
+    });
+
+    usuarios.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate('/usuarios');
+    });
+
+    pedidos.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate('/pedidos');
+    });
+
+    cerrarSesion.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Limpiar tokens y redirigir a login
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        navigate('/login');
+    });
 
     divMenu.classList.add('nav-menu');
     divLogo.classList.add('nav-logo');
 
+    divMenu.appendChild(administrarProductos);
+    divMenu.appendChild(crearProducto);
+    divMenu.appendChild(usuarios);
     divMenu.appendChild(pedidos);
-    divMenu.appendChild(clientes);
-    divMenu.appendChild(productos);
     divMenu.appendChild(cerrarSesion);
     divLogo.appendChild(logoApi);
 

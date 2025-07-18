@@ -4,11 +4,12 @@ import { loadView } from "../helpers/loadView";
 // Importa aquí tus controladores según la estructura de tu proyecto
 // Ejemplo:
 import { inicioControlador } from "../views/inicio/inicioControlador.js";
-
 import { catalogoControlador } from "../views/catalogo/catalogoControlador.js";
-
 import { registrarseControlador } from "../views/login/registrarse/registrarseControlador.js";
 import { validarControlador } from "../views/login/validar/validarControlador.js";
+import { loadCrearProducto } from "../views/crearproducto/crearProducto.js";
+import { loadAdministrarProductos } from "../views/administrar-productos/administrarProductosControlador.js";
+import { loadUsuarios } from "../views/usuarios/usuariosControlador.js";
 
 const routes = {
     login: {
@@ -61,10 +62,35 @@ const routes = {
         controlador: window.pedidosController,
         private: true,
     },
-    catalogo: {
-        template: "catalogo/index.html",
-        controlador: catalogoControlador,
-        private: false,
+    productos: {
+        template: "productos/index.html",
+        controlador: window.productosController,
+        private: true,
+    },
+    clientes: {
+        template: "usuarios/index.html",
+        controlador: window.usuariosController,
+        private: true,
+    },
+    usuarios: {
+        template: "usuarios/index.html",
+        controlador: window.usuariosController,
+        private: true,
+    },
+    "crear-producto": {
+        template: "crearproducto/index.html",
+        controlador: loadCrearProducto,
+        private: true,
+    },
+    "administrar-productos": {
+        template: "administrar-productos/index.html",
+        controlador: loadAdministrarProductos,
+        private: true,
+    },
+    "usuarios": {
+        template: "usuarios/index.html",
+        controlador: loadUsuarios,
+        private: true,
     },
     // Puedes agregar más rutas aquí, incluyendo rutas con parámetros dinámicos si lo necesitas
     // ejemplo: "producto/:id": { ... }
@@ -72,21 +98,29 @@ const routes = {
 
 // Función principal del router
 export const router = async (app) => {
-    // Usar pathname en vez de hash
-    const path = location.pathname.replace(/^\//, ''); // Quita el / inicial
-    const [rutas, params] = matchRoute(path); // Busca la ruta y extrae parámetros
+    // Usar hash para SPA
+    let hash = location.hash.replace('#', '') || ''; // Quita el # inicial
+    
+    // Si no hay hash, establecer 'inicio' como hash por defecto
+    if (hash === '' || hash === '/') {
+        hash = 'inicio';
+        // Establecer el hash sin disparar hashchange
+        history.replaceState(null, '', '#inicio');
+    }
+    
+    const [rutas, params] = matchRoute(hash); // Busca la ruta y extrae parámetros
 
     if (!rutas) {
         // Si la ruta no existe, redirige a inicio
         await loadView(app, "inicio/index.html");
-        if (window.inicioController) window.inicioController();
+        if (inicioControlador) inicioControlador();
         return;
     }
 
-    // Si la ruta es privada y el usuario no está autenticado, redirige a register
+    // Si la ruta es privada y el usuario no está autenticado, redirige a login
     if (rutas.private && !Autenticado()) {
-        await loadView(app, "registro/registro.html");
-        if (window.registroController) window.registroController();
+        await loadView(app, "login/validar/index.html");
+        if (validarControlador) validarControlador();
         return;
     }
 
@@ -94,11 +128,19 @@ export const router = async (app) => {
     await loadView(app, rutas.template);
 
     // Ejecuta el controlador, pasando los parámetros si existen
-    if (rutas.controlador) rutas.controlador(params);
+    if (rutas.controlador) {
+        rutas.controlador(params);
+    }
 };
 
 // Busca la ruta que coincide y extrae los parámetros dinámicos
 const matchRoute = (hash) => {
+    // Búsqueda exacta primero
+    if (routes[hash]) {
+        return [routes[hash], {}];
+    }
+    
+    // Si no hay coincidencia exacta, buscar con parámetros dinámicos
     const arreglo = hash.split('/');
 
     for (const route in routes) {
@@ -125,17 +167,19 @@ const matchRoute = (hash) => {
 
 // Navegación SPA: cambia el hash y dispara el router
 export function navigate(ruta) {
-    const newPath = `/${ruta}`;
-    if (location.pathname !== newPath) {
-        history.pushState({}, '', newPath);
-        router(document.querySelector('#app'));
+    const newHash = `#${ruta}`;
+    if (location.hash !== newHash) {
+        location.hash = newHash;
     } else {
         // Si ya estamos en la ruta, forzar recarga del router
         router(document.querySelector('#app'));
     }
 }
 
-// Escucha el evento popstate para navegación con botones del navegador
-window.addEventListener('popstate', () => {
+// Hacer navigate disponible globalmente
+window.navigate = navigate;
+
+// Escucha el evento hashchange para navegación con hash
+window.addEventListener('hashchange', () => {
     router(document.querySelector('#app'));
 });

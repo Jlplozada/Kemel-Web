@@ -1,0 +1,231 @@
+import { API_URL } from '../../helpers/api.js';
+
+class CrearProductoControlador {
+    constructor() {
+        this.initializeForm();
+        this.setupEventListeners();
+    }
+
+    initializeForm() {
+        this.form = document.getElementById('form-crear-producto');
+        this.imagenInput = document.getElementById('imagen');
+        this.previewContainer = document.getElementById('preview-container');
+        this.imagePreview = document.getElementById('image-preview');
+        this.removeImageBtn = document.getElementById('remove-image');
+        this.mensajeResultado = document.getElementById('mensaje-resultado');
+        this.btnCrear = document.getElementById('btn-crear');
+        this.btnCancelar = document.getElementById('btn-cancelar');
+    }
+
+    setupEventListeners() {
+        // Evento para el formulario
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        
+        // Evento para cancelar
+        this.btnCancelar.addEventListener('click', () => this.handleCancel());
+        
+        // Eventos para la imagen
+        this.imagenInput.addEventListener('change', (e) => this.handleImageChange(e));
+        this.removeImageBtn.addEventListener('click', () => this.removeImage());
+        
+        // Validación en tiempo real del precio
+        document.getElementById('precio').addEventListener('input', (e) => {
+            this.validatePrice(e.target);
+        });
+        
+        // Validación en tiempo real del nombre
+        document.getElementById('nombre').addEventListener('input', (e) => {
+            this.validateName(e.target);
+        });
+    }
+
+    handleImageChange(event) {
+        const file = event.target.files[0];
+        
+        if (!file) {
+            this.removeImage();
+            return;
+        }
+
+        // Validar tipo de archivo
+        if (!file.type.startsWith('image/')) {
+            this.showMessage('Por favor, selecciona un archivo de imagen válido.', 'error');
+            this.imagenInput.value = '';
+            return;
+        }
+
+        // Validar tamaño (5MB máximo)
+        if (file.size > 5 * 1024 * 1024) {
+            this.showMessage('La imagen debe ser menor a 5MB.', 'error');
+            this.imagenInput.value = '';
+            return;
+        }
+
+        // Mostrar vista previa
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.imagePreview.src = e.target.result;
+            this.previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    removeImage() {
+        this.imagenInput.value = '';
+        this.previewContainer.style.display = 'none';
+        this.imagePreview.src = '';
+    }
+
+    validatePrice(input) {
+        const value = parseFloat(input.value);
+        
+        if (isNaN(value) || value < 0) {
+            input.setCustomValidity('El precio debe ser un número positivo');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+
+    validateName(input) {
+        const value = input.value.trim();
+        
+        if (value.length < 2) {
+            input.setCustomValidity('El nombre debe tener al menos 2 caracteres');
+        } else if (value.length > 100) {
+            input.setCustomValidity('El nombre no puede exceder 100 caracteres');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+
+    async createProduct(formData) {
+        try {
+            const response = await fetch(`${API_URL}/productos`, {
+                method: 'POST',
+                body: formData // Enviar FormData directamente
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Error al crear el producto');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error al crear producto:', error);
+            throw new Error(error.message || 'No se pudo crear el producto');
+        }
+    }
+
+    async handleSubmit(event) {
+        event.preventDefault();
+        
+        // Validar formulario
+        if (!this.form.checkValidity()) {
+            this.form.reportValidity();
+            return;
+        }
+
+        this.setLoading(true);
+        this.hideMessage();
+
+        try {
+            const formData = new FormData(this.form);
+            
+            // Agregar un creado_por temporal (debería venir de la sesión del usuario)
+            formData.append('creado_por', 1); // ID temporal del usuario logueado
+
+            // Crear producto con FormData (incluye la imagen)
+            const result = await this.createProduct(formData);
+            
+            this.showMessage('Producto creado exitosamente', 'exito');
+            this.resetForm();
+            
+            // Redirigir después de 2 segundos
+            setTimeout(() => {
+                window.location.hash = '#/productos';
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error:', error);
+            this.showMessage(error.message || 'Error al crear el producto', 'error');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    handleCancel() {
+        if (this.hasChanges()) {
+            if (confirm('¿Estás seguro de que quieres cancelar? Se perderán todos los cambios.')) {
+                window.location.hash = '#/productos';
+            }
+        } else {
+            window.location.hash = '#/productos';
+        }
+    }
+
+    hasChanges() {
+        const formData = new FormData(this.form);
+        const nombre = formData.get('nombre').trim();
+        const descripcion = formData.get('descripcion').trim();
+        const precio = formData.get('precio');
+        const imagen = formData.get('imagen');
+
+        return nombre || descripcion || precio || (imagen && imagen.size > 0);
+    }
+
+    setLoading(loading) {
+        const spinner = this.btnCrear.querySelector('.loading-spinner');
+        const text = this.btnCrear.querySelector('span:not(.loading-spinner)') || this.btnCrear;
+        
+        if (loading) {
+            spinner.style.display = 'inline-block';
+            text.textContent = 'Creando...';
+            this.btnCrear.disabled = true;
+        } else {
+            spinner.style.display = 'none';
+            text.textContent = 'Crear Producto';
+            this.btnCrear.disabled = false;
+        }
+    }
+
+    showMessage(message, type) {
+        this.mensajeResultado.textContent = message;
+        this.mensajeResultado.className = `mensaje ${type}`;
+        this.mensajeResultado.style.display = 'block';
+        
+        // Scroll hacia el mensaje
+        this.mensajeResultado.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+    }
+
+    hideMessage() {
+        this.mensajeResultado.style.display = 'none';
+    }
+
+    resetForm() {
+        this.form.reset();
+        this.removeImage();
+        this.hideMessage();
+    }
+}
+
+// Función para cargar el controlador
+export function loadCrearProducto() {
+    new CrearProductoControlador();
+}
+
+// Auto-inicializar si se carga directamente
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        if (document.getElementById('form-crear-producto')) {
+            loadCrearProducto();
+        }
+    });
+} else {
+    if (document.getElementById('form-crear-producto')) {
+        loadCrearProducto();
+    }
+}

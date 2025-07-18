@@ -1,88 +1,241 @@
 
+import { registrarUsuario, obtenerCiudades } from '../../../helpers/api.js';
 
 export function registrarseControlador() {
+  console.log("registrarseControlador ejecutado");
+
   // Cargar ciudades desde la API y poblar el select
-  const selectCiudad = document.getElementById("ciudad");
-  if (selectCiudad) {
-    selectCiudad.innerHTML = '<option value="">Selecciona una ciudad...</option>';
-    fetch("http://localhost:5010/ciudades")
-      .then(res => res.json())
-      .then(ciudades => {
-        ciudades.forEach(c => {
-          const option = document.createElement("option");
-          option.value = c.id;
-          option.textContent = c.nombre;
-          selectCiudad.appendChild(option);
-        });
-      })
-      .catch(err => {
-        console.error("Error al cargar ciudades:", err);
-      });
-  }
+  cargarCiudades();
+
+  // Configurar funcionalidad de mostrar/ocultar contraseñas
+  configurarMostrarPasswords();
+
+  // Configurar el formulario de registro
   const form = document.getElementById("registro-form");
   if (!form) return;
-  form.addEventListener("submit", function (e) {
+
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    let valido = true;
-
-    // Limpiar errores
-    document.querySelectorAll(".error").forEach(el => el.textContent = "");
-
-    // Validar nombre
-    const nombre = form.nombre.value.trim();
-    if (nombre.length < 3) {
-      document.getElementById("error-nombre").textContent = "El nombre debe tener al menos 3 caracteres.";
-      valido = false;
-    }
-
-    // Validar email
-    const email = form.email.value.trim();
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      document.getElementById("error-email").textContent = "Correo electrónico inválido.";
-      valido = false;
-    }
-
-    // Validar contraseña
-    const password = form.password.value;
-    if (password.length < 6) {
-      document.getElementById("error-password").textContent = "La contraseña debe tener al menos 6 caracteres.";
-      valido = false;
-    }
-
-    // Validar confirmación
-    const confirmar = form.confirmar.value;
-    if (password !== confirmar) {
-      document.getElementById("error-confirmar").textContent = "Las contraseñas no coinciden.";
-      valido = false;
-    }
-
-    if (valido) {
-      // Enviar datos a la API
-      const datos = {
-        nombre,
-        email,
-        password
-      };
-      fetch("/api/registro", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(datos)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert("Registro exitoso!");
-          form.reset();
-        } else {
-          // Mostrar error de la API
-          document.getElementById("error-email").textContent = data.message || "Error en el registro.";
-        }
-      })
-      .catch(() => {
-        document.getElementById("error-email").textContent = "No se pudo conectar con el servidor.";
-      });
+    
+    if (validarFormulario(form)) {
+      await procesarRegistro(form);
     }
   });
+
+  // Navegación SPA para el enlace de login
+  const linkLogin = document.querySelector('.form-links a');
+  if (linkLogin) {
+    linkLogin.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.navigate ? window.navigate('login') : window.location.hash = '#/login';
+    });
+  }
+}
+
+// Función para cargar ciudades desde la API
+async function cargarCiudades() {
+  const selectCiudad = document.getElementById("ciudad");
+  if (!selectCiudad) return;
+
+  selectCiudad.innerHTML = '<option value="">Cargando ciudades...</option>';
+  
+  const resultado = await obtenerCiudades();
+  
+  if (resultado.success) {
+    selectCiudad.innerHTML = '<option value="">Selecciona una ciudad...</option>';
+    resultado.data.forEach(ciudad => {
+      const option = document.createElement("option");
+      option.value = ciudad.id;
+      option.textContent = ciudad.nombre;
+      selectCiudad.appendChild(option);
+    });
+  } else {
+    selectCiudad.innerHTML = '<option value="">Error al cargar ciudades</option>';
+    console.error("Error al cargar ciudades:", resultado.error);
+  }
+}
+
+// Función para validar el formulario
+function validarFormulario(form) {
+  let valido = true;
+
+  // Limpiar errores anteriores
+  limpiarErrores();
+
+  // Validar nombre
+  const nombre = form.nombre.value.trim();
+  if (nombre.length < 3) {
+    mostrarError("error-nombre", "El nombre debe tener al menos 3 caracteres.");
+    valido = false;
+  }
+
+  // Validar usuario
+  const usuario = form.usuario.value.trim();
+  if (usuario.length < 3) {
+    mostrarError("error-usuario", "El usuario debe tener al menos 3 caracteres.");
+    valido = false;
+  }
+
+  // Validar email
+  const email = form.email.value.trim();
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    mostrarError("error-email", "Correo electrónico inválido.");
+    valido = false;
+  }
+
+  // Validar contraseña
+  const password = form.password.value;
+  if (password.length < 6) {
+    mostrarError("error-password", "La contraseña debe tener al menos 6 caracteres.");
+    valido = false;
+  }
+
+  // Validar confirmación
+  const confirmar = form.confirmar.value;
+  if (password !== confirmar) {
+    mostrarError("error-confirmar", "Las contraseñas no coinciden.");
+    valido = false;
+  }
+
+  // Validar teléfono
+  const telefono = form.telefono.value.trim();
+  if (telefono && !/^\d{10}$/.test(telefono)) {
+    mostrarError("error-telefono", "El teléfono debe tener 10 dígitos.");
+    valido = false;
+  }
+
+  return valido;
+}
+
+// Función para procesar el registro
+async function procesarRegistro(form) {
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const textoOriginal = submitBtn.textContent;
+  
+  // Mostrar estado de carga
+  submitBtn.textContent = 'Registrando...';
+  submitBtn.disabled = true;
+
+  try {
+    // Preparar datos para enviar
+    const datosUsuario = {
+      nombre: form.nombre.value.trim(),
+      email: form.email.value.trim(),
+      password: form.password.value,
+      telefono: form.telefono.value.trim() || null,
+      direccion: form.direccion.value.trim() || null,
+      ciudad: form.ciudad.value || null
+    };
+
+    // Enviar datos a la API
+    const resultado = await registrarUsuario(datosUsuario);
+    
+    if (resultado.success) {
+      // Registro exitoso
+      mostrarExitoGeneral("¡Registro exitoso! Puedes iniciar sesión ahora.");
+      form.reset();
+      
+      // Redirigir al login después de un breve delay
+      setTimeout(() => {
+        window.navigate ? window.navigate('login') : window.location.hash = '#/login';
+      }, 2000);
+      
+    } else {
+      // Error en el registro
+      mostrarError("error-general", resultado.error);
+    }
+    
+  } catch (error) {
+    console.error('Error inesperado:', error);
+    mostrarError("error-general", "Error inesperado. Por favor, intenta de nuevo.");
+  } finally {
+    // Restaurar el botón
+    submitBtn.textContent = textoOriginal;
+    submitBtn.disabled = false;
+  }
+}
+
+// Función para limpiar errores
+function limpiarErrores() {
+  const errores = document.querySelectorAll('[id^="error-"]');
+  errores.forEach(error => {
+    if (error) error.textContent = "";
+  });
+  
+  const mensajeGeneral = document.querySelector('.mensaje-general');
+  if (mensajeGeneral) {
+    mensajeGeneral.remove();
+  }
+}
+
+// Función para mostrar error específico
+function mostrarError(idError, mensaje) {
+  let errorElement = document.getElementById(idError);
+  
+  if (!errorElement) {
+    // Si no existe el elemento de error, crearlo
+    errorElement = document.createElement('div');
+    errorElement.id = idError;
+    errorElement.className = 'error';
+    errorElement.style.cssText = `
+      color: #c33;
+      font-size: 0.9em;
+      margin-top: 5px;
+    `;
+    
+    // Encontrar el campo relacionado y agregar el error después
+    const campo = idError.replace('error-', '');
+    const input = document.getElementById(campo) || document.querySelector(`[name="${campo}"]`);
+    if (input && input.parentNode) {
+      input.parentNode.appendChild(errorElement);
+    }
+  }
+  
+  errorElement.textContent = mensaje;
+}
+
+// Función para mostrar mensaje de éxito general
+function mostrarExitoGeneral(mensaje) {
+  // Remover mensaje anterior
+  const mensajeAnterior = document.querySelector('.mensaje-general');
+  if (mensajeAnterior) {
+    mensajeAnterior.remove();
+  }
+
+  // Crear nuevo mensaje
+  const mensajeDiv = document.createElement('div');
+  mensajeDiv.className = 'mensaje-general';
+  mensajeDiv.style.cssText = `
+    background-color: #efe;
+    color: #3c3;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #cfc;
+    text-align: center;
+    font-weight: bold;
+  `;
+  mensajeDiv.textContent = mensaje;
+
+  const form = document.getElementById("registro-form");
+  form.insertBefore(mensajeDiv, form.firstChild);
+}
+
+// Función para configurar la funcionalidad de mostrar/ocultar contraseñas
+function configurarMostrarPasswords() {
+  const checkboxMostrar = document.getElementById('mostrar-passwords');
+  const inputPassword = document.getElementById('password');
+  const inputConfirmar = document.getElementById('confirmar');
+  
+  if (checkboxMostrar && inputPassword && inputConfirmar) {
+    checkboxMostrar.addEventListener('change', function() {
+      if (this.checked) {
+        inputPassword.type = 'text';
+        inputConfirmar.type = 'text';
+      } else {
+        inputPassword.type = 'password';
+        inputConfirmar.type = 'password';
+      }
+    });
+  }
 }

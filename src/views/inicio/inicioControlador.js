@@ -1,16 +1,36 @@
-export const inicioControlador = () => {
+import { getUsuario, Autenticado } from '../../helpers/auth.js';
+import { cargarHeaderSegunRol } from '../../helpers/gestionRoles.js';
+
+export const inicioControlador = async () => {
+    console.log("Ejecutando inicioControlador...");
+
+    // La página de inicio es pública - no necesita protección
+    // Solo cargar el header correcto si el usuario está autenticado
+    if (Autenticado()) {
+        await cargarHeaderSegunRol();
+    }
+
     // Limpiar solo el contenedor principal de la app
     const app = document.getElementById('app');
     if (!app) return;
     app.innerHTML = '';
 
+    // Obtener información del usuario para personalizar la bienvenida (si está logueado)
+    const usuario = getUsuario();
+    const nombreUsuario = usuario ? usuario.nombre : 'Visitante';
+    const estaLogueado = Autenticado();
+
     // Crear sección de bienvenida
     const section = document.createElement('section');
     section.className = 'inicio-section';
 
-    // Título principal
+    // Título principal personalizado
     const titulo = document.createElement('h1');
-    titulo.textContent = 'Bienvenido a Kemel: Panadería Saludable';
+    if (estaLogueado) {
+        titulo.textContent = `¡Hola ${nombreUsuario}! Bienvenido a Kemel: Panadería Saludable`;
+    } else {
+        titulo.textContent = '¡Bienvenido a Kemel: Panadería Saludable!';
+    }
     section.appendChild(titulo);
 
 

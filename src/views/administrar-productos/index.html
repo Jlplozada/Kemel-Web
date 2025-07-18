@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="./src/views/administrar-productos/administrarProductos.css">
+<div class="administrar-productos-container">
+    <div class="admin-header">
+        <h1>Administrar Productos</h1>
+        <p>Gestiona todos los productos de la plataforma</p>
+    </div>
+
+    <div class="productos-filters">
+        <div class="search-container">
+            <input type="text" id="buscar-producto" placeholder="Buscar producto..." />
+            <button id="btn-buscar">🔍</button>
+        </div>
+        <div class="filter-container">
+            <select id="filtro-estado">
+                <option value="activo">Productos Activos</option>
+                <option value="eliminado">Productos Eliminados</option>
+                <option value="todos">Todos los Productos</option>
+            </select>
+        </div>
+        <div class="actions-container">
+            <button id="btn-crear-nuevo" class="btn-primary">
+                + Crear Nuevo Producto
+            </button>
+        </div>
+    </div>
+
+    <div id="loading-productos" class="loading-spinner" style="display: none;">
+        <p>Cargando productos...</p>
+    </div>
+
+    <div id="productos-grid" class="productos-grid">
+        <!-- Los productos se cargarán aquí dinámicamente -->
+    </div>
+
+    <div id="no-productos" class="no-productos" style="display: none;">
+        <p>No se encontraron productos</p>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div id="modal-eliminar" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Confirmar Eliminación</h3>
+            <p>¿Estás seguro de que quieres eliminar este producto?</p>
+            <p><strong id="producto-nombre-eliminar"></strong></p>
+            <div class="modal-actions">
+                <button id="btn-confirmar-eliminar" class="btn-danger">Eliminar</button>
+                <button id="btn-cancelar-eliminar" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para restaurar producto -->
+    <div id="modal-restaurar" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Restaurar Producto</h3>
+            <p>¿Quieres restaurar este producto?</p>
+            <p><strong id="producto-nombre-restaurar"></strong></p>
+            <div class="modal-actions">
+                <button id="btn-confirmar-restaurar" class="btn-primary">Restaurar</button>
+                <button id="btn-cancelar-restaurar" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mensaje-resultado" class="mensaje-resultado"></div>
+</div>

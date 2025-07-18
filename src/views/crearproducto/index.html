@@ -1,0 +1,86 @@
+<div class="crear-producto-container"></div>
+    <div class="form-header">
+        <h2>Crear Nuevo Producto</h2>
+        <p>Completa la información para agregar un nuevo producto al catálogo</p>
+    </div>
+
+    <form id="form-crear-producto" class="producto-form" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="nombre">Nombre del Producto *</label>
+            <input 
+                type="text" 
+                id="nombre" 
+                name="nombre" 
+                required 
+                maxlength="100"
+                placeholder="Ej: Pan Integral"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <textarea 
+                id="descripcion" 
+                name="descripcion" 
+                rows="4"
+                placeholder="Describe las características del producto..."
+            ></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="precio">Precio *</label>
+            <div class="precio-input">
+                <span class="currency">$</span>
+                <input 
+                    type="number" 
+                    id="precio" 
+                    name="precio" 
+                    required 
+                    min="0" 
+                    step="0.01"
+                    placeholder="0.00"
+                >
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="imagen">Imagen del Producto</label>
+            <div class="file-upload-container">
+                <input 
+                    type="file" 
+                    id="imagen" 
+                    name="imagen" 
+                    accept="image/*"
+                    class="file-input"
+                >
+                <label for="imagen" class="file-label">
+                    <span class="file-icon">📷</span>
+                    <span class="file-text">Seleccionar imagen</span>
+                </label>
+                <div class="file-preview" id="preview-container" style="display: none;">
+                    <img id="image-preview" src="" alt="Vista previa">
+                    <button type="button" class="remove-image" id="remove-image">×</button>
+                </div>
+            </div>
+            <small class="file-hint">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</small>
+        </div>
+
+        <div class="form-group">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado">
+                <option value="activo" selected>Activo</option>
+                <option value="inactivo">Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" id="btn-cancelar">Cancelar</button>
+            <button type="submit" class="btn-submit" id="btn-crear">
+                <span class="loading-spinner" style="display: none;">⏳</span>
+                Crear Producto
+            </button>
+        </div>
+    </form>
+
+    <div id="mensaje-resultado" class="mensaje" style="display: none;"></div>
+</div>

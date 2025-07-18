@@ -9,67 +9,74 @@
 <body>
   <form id="registro-form" class="form-login" autocomplete="on">
     <h2>Crear cuenta</h2>
+    
     <div class="form-group">
       <label for="usuario">Usuario</label>
       <input type="text" id="usuario" name="usuario" required placeholder="Nombre de usuario">
+      <div id="error-usuario" class="error"></div>
     </div>
+    
     <div class="form-group">
       <label for="nombre">Nombre completo</label>
       <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre completo">
+      <div id="error-nombre" class="error"></div>
     </div>
-    <div class="form-group">
-      <label for="password">Contraseña</label>
-      <input type="password" id="password" name="password" required minlength="6" placeholder="Crea una contraseña">
-    </div>
-    <div class="form-group">
-      <label for="confirmar">Confirmar contraseña</label>
-      <input type="password" id="confirmar" name="confirmar" required minlength="6" placeholder="Repite la contraseña">
-    </div>
+    
     <div class="form-group">
       <label for="email">Correo electrónico</label>
       <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
+      <div id="error-email" class="error"></div>
     </div>
+    
+    <div class="form-group">
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" name="password" required minlength="6" placeholder="Crea una contraseña">
+      <div id="error-password" class="error"></div>
+    </div>
+    
+    <div class="form-group">
+      <label for="confirmar">Confirmar contraseña</label>
+      <input type="password" id="confirmar" name="confirmar" required minlength="6" placeholder="Repite la contraseña">
+      <div id="error-confirmar" class="error"></div>
+    </div>
+    
+    <div class="form-group checkbox-group">
+      <label class="checkbox-label">
+        <input type="checkbox" id="mostrar-passwords" class="checkbox-input">
+        <span class="checkbox-text">Ver contraseñas</span>
+      </label>
+    </div>
+    
     <div class="form-group">
       <label for="telefono">Teléfono</label>
-      <input type="tel" id="telefono" name="telefono" required placeholder="Ej: 3001234567">
+      <input type="tel" id="telefono" name="telefono" placeholder="Ej: 3001234567">
+      <div id="error-telefono" class="error"></div>
     </div>
+    
     <div class="form-group">
       <label for="direccion">Dirección</label>
-      <input type="text" id="direccion" name="direccion" required placeholder="Dirección de residencia">
+      <input type="text" id="direccion" name="direccion" placeholder="Dirección de residencia">
+      <div id="error-direccion" class="error"></div>
     </div>
+    
     <div class="form-group">
       <label for="ciudad">Ciudad</label>
-      <select id="ciudad" name="ciudad" required>
+      <select id="ciudad" name="ciudad">
         <option value="">Selecciona una ciudad...</option>
       </select>
+      <div id="error-ciudad" class="error"></div>
     </div>
+    
     <button type="submit" class="form-btn">Registrarse</button>
+    
     <div class="form-links">
       <a href="/login" id="btn-login">¿Ya tienes cuenta? Inicia sesión</a>
     </div>
   </form>
-    <script type="module">
-      import { registrarseControlador } from './registrarseControlador.js';
-      registrarseControlador();
-      window.onload = function() {
-        async function cargarCiudades() {
-          try {
-            const res = await fetch('http://localhost:5010/ciudades');
-            const ciudades = await res.json();
-            const select = document.getElementById('ciudad');
-            select.innerHTML = '<option value="">Selecciona una ciudad...</option>';
-            ciudades.forEach(c => {
-              const option = document.createElement('option');
-              option.value = c.id;
-              option.textContent = c.nombre;
-              select.appendChild(option);
-            });
-          } catch (err) {
-            console.error('Error al cargar ciudades:', err);
-          }
-        }
-        cargarCiudades();
-      }
-    </script>
+
+  <script type="module">
+    import { registrarseControlador } from './registrarseControlador.js';
+    registrarseControlador();
+  </script>
 </body>
 </html>

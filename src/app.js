@@ -66,13 +66,8 @@ if (accessToken) {
   renderHeaderPorRol(undefined, false);
 }
 
-// Ejemplo: cargar historias del usuario al hacer click en subir_capitulo
-
-// Manejo de navegación SPA
-window.addEventListener('hashchange', () => {
-    router(app);
-});
-
+// Manejo de navegación SPA - ya está configurado en router.js
+// Solo necesitamos inicializar cuando carga la página
 document.addEventListener("DOMContentLoaded", () => {
     router(app);
     // Renderizar footer solo una vez

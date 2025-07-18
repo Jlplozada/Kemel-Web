@@ -10,22 +10,31 @@ export const headerPanadero = () => {
     const menuBtn = document.createElement('button');
     const menuIcon = document.createElement('img');
 
-    // Botón de navegación único
+    // Botones de navegación
     const pedidos = document.createElement('a');
+    const crearProducto = document.createElement('a');
+    const cerrarSesion = document.createElement('a');
 
     logo.src = '../public/kemel.png';
     logo.alt = 'Logo Kemel';
 
-    logoApi.href = '#panadero';
+    logoApi.href = '#/inicio';
     logoApi.appendChild(logo);
 
     pedidos.textContent = 'Pedidos';
-    pedidos.setAttribute('href', '#pedidos');
+    crearProducto.textContent = 'Crear Producto';
+    cerrarSesion.textContent = 'Cerrar sesión';
+
+    pedidos.setAttribute('href', '#/pedidos');
+    crearProducto.setAttribute('href', '#/crear-producto');
+    cerrarSesion.setAttribute('href', '#/login');
 
     divMenu.classList.add('nav-menu');
     divLogo.classList.add('nav-logo');
 
     divMenu.appendChild(pedidos);
+    divMenu.appendChild(crearProducto);
+    divMenu.appendChild(cerrarSesion);
     divLogo.appendChild(logoApi);
 
     menuBtn.classList.add('menu-hamburguesa');
@@ -37,12 +46,26 @@ export const headerPanadero = () => {
         divMenu.classList.toggle('activo');
     });
 
-    // Interceptar el click para usar el router SPA
+    // Event listeners para navegación
     pedidos.addEventListener('click', (e) => {
         e.preventDefault();
         divMenu.classList.remove('activo');
-        const ruta = pedidos.getAttribute('href').replace('#', '');
-        navigate(ruta);
+        navigate('/pedidos');
+    });
+
+    crearProducto.addEventListener('click', (e) => {
+        e.preventDefault();
+        divMenu.classList.remove('activo');
+        navigate('/crear-producto');
+    });
+
+    cerrarSesion.addEventListener('click', (e) => {
+        e.preventDefault();
+        divMenu.classList.remove('activo');
+        // Limpiar tokens y redirigir a login
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        navigate('/login');
     });
 
     barraNavegacion.appendChild(divLogo);
