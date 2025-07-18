@@ -4,29 +4,47 @@ import { loadView } from "../helpers/loadView";
 // Importa aquí tus controladores según la estructura de tu proyecto
 // Ejemplo:
 import { inicioControlador } from "../views/inicio/inicioControlador.js";
-// import { productosController } from "../views/productos/controllers/productosController.js";
-// ...
+
+import { catalogoControlador } from "../views/catalogo/catalogoControlador.js";
+
+import { registrarseControlador } from "../views/login/registrarse/registrarseControlador.js";
+import { validarControlador } from "../views/login/validar/validarControlador.js";
 
 const routes = {
+    login: {
+        template: "login/validar/index.html",
+        controlador: validarControlador,
+        private: false,
+    },
+    cuenta: {
+        template: "login/validar/index.html",
+        controlador: validarControlador,
+        private: false,
+    },
     "": {
-        template: "inicio/inicio.html",
+        template: "inicio/index.html",
         controlador: inicioControlador,
         private: false,
     },
     inicio: {
-        template: "inicio/inicio.html",
+        template: "inicio/index.html",
         controlador: inicioControlador,
         private: false,
     },
-    productos: {
-        template: "productos/index.html",
-        controlador: window.productosController,
+    catalogo: {
+        template: "catalogo/index.html",
+        controlador: catalogoControlador,
         private: false,
     },
     register: {
-        template: "registro/registro.html",
-        controlador: window.registroController,
+        template: "login/registrarse/index.html",
+        controlador: registrarseControlador,
         private: false,
+    },
+    validar:{
+        template: "login/validar/index.html",
+        controlador: validarControlador,
+        private: true,
     },
     panadero: {
         template: "panadero/index.html",
@@ -45,7 +63,7 @@ const routes = {
     },
     catalogo: {
         template: "catalogo/index.html",
-        controlador: window.catalogoController,
+        controlador: catalogoControlador,
         private: false,
     },
     // Puedes agregar más rutas aquí, incluyendo rutas con parámetros dinámicos si lo necesitas

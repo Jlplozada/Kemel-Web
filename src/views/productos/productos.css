@@ -1,0 +1,74 @@
+
+.producto-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
+  padding: 1.5rem;
+  margin: 1rem;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+}
+.producto-card:hover {
+  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.13);
+}
+
+.producto-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  background: #f8f8f8;
+  box-shadow: 0 2px 8px 0 rgba(183,123,59,0.13);
+}
+
+.producto-card h3 {
+  font-size: 1.1rem;
+  color: #67072a;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.producto-card p {
+  font-size: 0.98rem;
+  color: #444;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.contador-div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  background: #f3f3f3;
+  border-radius: 0.7rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.btn-menos, .btn-mas {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  color: #67072a;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s;
+}
+.btn-menos:hover, .btn-mas:hover {
+  background: #ffe6f0;
+  border-color: #67072a;
+}
+
+.cantidad-span {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #222;
+  min-width: 32px;
+  text-align: center;
+}

@@ -1,3 +1,92 @@
+/* Estilo para el select del formulario de registro */
+.form-group select {
+  padding: 0.7rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  background: #fff;
+  color: #222;
+  transition: border 0.2s;
+  margin-top: 0.2rem;
+}
+.form-group select:focus {
+  border-color: #67072a;
+}
+.form-group option {
+  color: #222;
+  background: #fff;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 60px;
+}
+/* --- Estilos para el formulario de login --- */
+.form-login {
+  max-width: 350px;
+  margin: 120px auto 40px auto;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
+  padding: 2rem 2.5rem 1.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.form-login h2 {
+  text-align: center;
+  color: #67072a;
+  margin-bottom: 1.5rem;
+}
+.form-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: #67072a;
+}
+.form-group input {
+  padding: 0.7rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+.form-group input:focus {
+  border-color: #67072a;
+}
+.form-btn {
+  background: #67072a;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.8rem 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+.form-btn:hover {
+  background: #a0134a;
+}
+.form-links {
+  text-align: center;
+  margin-top: 1.2rem;
+}
+.form-links a {
+  color: #67072a;
+  text-decoration: underline;
+  font-size: 0.98rem;
+}
 /*
   Barra de navegación principal, fija en la parte superior, con fondo y sombra.
   Usa grid para organizar el logo y el menú.

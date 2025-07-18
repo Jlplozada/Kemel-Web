@@ -136,6 +136,7 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+}
 
 .img-inicio {
   width: 220px;
@@ -144,9 +145,8 @@
   border-radius: 1rem;
   box-shadow: 0 2px 8px 0 rgba(183,123,59,0.13);
   background: #fff;
-}
-  width: 220px;
   max-width: 100%;
+}
 @media (max-width: 600px) {
   .inicio-section {
     padding: 1rem 0.5rem;
