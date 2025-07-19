@@ -84,7 +84,9 @@ function crearCardCatalogo(producto) {
 
   btnMas.addEventListener("click", () => {
     let cantidad = parseInt(cantidadSpan.textContent);
-    cantidadSpan.textContent = cantidad + 1;
+    if (cantidad < 5) {
+      cantidadSpan.textContent = cantidad + 1;
+    }
   });
   btnMenos.addEventListener("click", () => {
     let cantidad = parseInt(cantidadSpan.textContent);

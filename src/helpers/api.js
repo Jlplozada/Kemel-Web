@@ -1,6 +1,6 @@
 import { getData, setData, clearAuth } from './auth.js';
 
-export const API_URL = "http://localhost:5010";
+export const API_URL = "https://api.kemel.online";
 
 // Función para hacer peticiones autenticadas
 export const authenticatedRequest = async (url, options = {}) => {

@@ -75,6 +75,12 @@ function validarFormulario(form) {
   if (usuario.length < 3) {
     mostrarError("error-usuario", "El usuario debe tener al menos 3 caracteres.");
     valido = false;
+  } else if (usuario.length > 50) {
+    mostrarError("error-usuario", "El usuario no puede exceder 50 caracteres.");
+    valido = false;
+  } else if (!/^[a-zA-Z0-9_]+$/.test(usuario)) {
+    mostrarError("error-usuario", "El usuario solo puede contener letras, números y guiones bajos.");
+    valido = false;
   }
 
   // Validar email
@@ -116,6 +122,7 @@ async function procesarRegistro(form) {
   try {
     // Preparar datos para enviar
     const datosUsuario = {
+      usuario: form.usuario.value.trim(),
       nombre: form.nombre.value.trim(),
       email: form.email.value.trim(),
       password: form.password.value,
@@ -130,7 +137,18 @@ async function procesarRegistro(form) {
     if (resultado.success) {
       // Registro exitoso
       cerrarAlerta();
-      await alertaExito('¡Registro Exitoso!', '¡Tu cuenta ha sido creada! Puedes iniciar sesión ahora.');
+      
+      // Construir mensaje con el nombre de usuario final
+      let mensaje = '¡Tu cuenta ha sido creada! Puedes iniciar sesión ahora.';
+      if (resultado.data && resultado.data.usuario) {
+        mensaje += `\n\nTu nombre de usuario final es: ${resultado.data.usuario}`;
+        if (resultado.data.mensaje) {
+          mensaje += `\n${resultado.data.mensaje}`;
+        }
+        mensaje += '\nPuedes usar este nombre de usuario o tu correo electrónico para iniciar sesión.';
+      }
+      
+      await alertaExito('¡Registro Exitoso!', mensaje);
       form.reset();
       
       // Redirigir al login
