@@ -39,21 +39,30 @@ class CrearProductoControlador {
 
     async loadProductData() {
         try {
-            console.log('Cargando datos del producto...');
+            console.log('Cargando datos del producto ID:', this.productId);
             
             const { token } = getData();
-            const response = await fetch(`${API_URL}/productos/${this.productId}`, {
+            const url = `${API_URL}/productos/${this.productId}`;
+            console.log('URL de consulta:', url);
+            
+            const response = await fetch(url, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
             if (!response.ok) {
-                throw new Error('No se pudo cargar el producto');
+                const errorText = await response.text();
+                console.log('Error response:', errorText);
+                throw new Error(`Error ${response.status}: No se pudo cargar el producto`);
             }
 
             const resultado = await response.json();
+            console.log('Resultado recibido:', resultado);
 
             if (resultado.success) {
                 this.fillForm(resultado.data);

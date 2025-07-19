@@ -1,7 +1,5 @@
 import { API_URL } from '../../helpers/api.js';
 import { getData } from '../../helpers/auth.js';
-import { alertaError, alertaExito, alertaLoading, cerrarAlerta } from '../../helpers/alertas.js';
-import Swal from 'sweetalert2';
 
 export const administrarProductosControlador = async () => {
     console.log("Ejecutando administrarProductosControlador...");
@@ -14,7 +12,7 @@ export const administrarProductosControlador = async () => {
         configurarControles();
     } catch (error) {
         console.error('Error al cargar vista de administrar productos:', error);
-        await alertaError('Error', 'Error al cargar la gestión de productos');
+        alert('Error al cargar la gestión de productos');
     }
 };
 
@@ -26,7 +24,7 @@ const cargarProductosAdmin = async () => {
     if (!tbody) return;
 
     try {
-        alertaLoading('Cargando', 'Obteniendo todos los productos...');
+        console.log('Cargando productos...');
 
         const { token } = getData();
         const url = `${API_URL}/productos/admin`; // Usar endpoint admin que trae todos los productos
@@ -40,7 +38,6 @@ const cargarProductosAdmin = async () => {
         });
 
         const resultado = await response.json();
-        cerrarAlerta();
 
         console.log("=== RESPUESTA DEL SERVIDOR PRODUCTOS ===");
         console.log("Success:", resultado.success);
@@ -70,9 +67,8 @@ const cargarProductosAdmin = async () => {
             mensajeSinProductos.style.display = 'block';
         }
     } catch (error) {
-        cerrarAlerta();
         console.error('Error al cargar productos:', error);
-        await alertaError('Error', 'Error al cargar los productos');
+        alert('Error al cargar los productos');
     }
 };
 
@@ -148,25 +144,15 @@ window.editarProducto = async (productoId) => {
 // Función global para eliminar producto
 window.eliminarProducto = async (productoId) => {
     try {
-        // Mostrar confirmación usando Swal directamente
-        const confirmacion = await Swal.fire({
-            title: '¿Estás seguro?',
-            text: 'El producto será marcado como eliminado y no aparecerá en el catálogo',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
-        });
+        // Confirmación simple
+        const confirmacion = confirm('¿Estás seguro? El producto será marcado como eliminado y no aparecerá en el catálogo');
 
         // Verificar si el usuario confirmó la eliminación
-        if (!confirmacion.isConfirmed) {
+        if (!confirmacion) {
             return;
         }
 
-        alertaLoading('Eliminando', 'Marcando producto como eliminado...');
+        console.log('Eliminando producto...');
 
         const { token } = getData();
         const response = await fetch(`${API_URL}/productos/${productoId}/estado`, {
@@ -179,19 +165,17 @@ window.eliminarProducto = async (productoId) => {
         });
 
         const resultado = await response.json();
-        cerrarAlerta();
 
         if (resultado.success) {
-            await alertaExito('¡Éxito!', 'Producto eliminado correctamente');
+            alert('Producto eliminado correctamente');
             // Recargar la tabla
             await cargarProductosAdmin();
         } else {
-            await alertaError('Error', resultado.error || 'Error al eliminar el producto');
+            alert(resultado.error || 'Error al eliminar el producto');
         }
     } catch (error) {
-        cerrarAlerta();
         console.error('Error al eliminar producto:', error);
-        await alertaError('Error', 'Error al eliminar el producto');
+        alert('Error al eliminar el producto');
     }
 };
 
