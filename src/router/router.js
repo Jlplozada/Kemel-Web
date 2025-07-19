@@ -1,8 +1,5 @@
-// Router SPA con rutas personalizadas y soporte para autenticación
 import { Autenticado } from "../helpers/auth.js";
 import { loadView } from "../helpers/loadView";
-// Importa aquí tus controladores según la estructura de tu proyecto
-// Ejemplo:
 import { inicioControlador } from "../views/inicio/inicioControlador.js";
 import { catalogoControlador } from "../views/catalogo/catalogoControlador.js";
 import { registrarseControlador } from "../views/login/registrarse/registrarseControlador.js";
@@ -49,47 +46,37 @@ const routes = {
     },
     panadero: {
         template: "panadero/index.html",
-        controlador: window.panaderoController,
+        controlador: '',
         private: true,
     },
     administrador: {
         template: "administrador/index.html",
-        controlador: window.administradorController,
+        controlador: '',
         private: true,
     },
     pedidos: {
         template: "pedidos/index.html",
-        controlador: window.pedidosController,
+        controlador: '',
         private: true,
     },
     productos: {
         template: "productos/index.html",
-        controlador: window.productosController,
+        controlador: '',
         private: true,
     },
     clientes: {
         template: "usuarios/index.html",
-        controlador: window.usuariosController,
+        controlador: '',
         private: true,
     },
     usuarios: {
         template: "usuarios/index.html",
-        controlador: window.usuariosController,
+        controlador: loadUsuarios,
         private: true,
     },
     "crear-producto": {
         template: "crearproducto/index.html",
         controlador: loadCrearProducto,
-        private: true,
-    },
-    "administrar-productos": {
-        template: "administrar-productos/index.html",
-        controlador: loadAdministrarProductos,
-        private: true,
-    },
-    "usuarios": {
-        template: "usuarios/index.html",
-        controlador: loadUsuarios,
         private: true,
     },
     // Puedes agregar más rutas aquí, incluyendo rutas con parámetros dinámicos si lo necesitas

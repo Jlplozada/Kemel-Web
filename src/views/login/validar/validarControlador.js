@@ -19,10 +19,10 @@ export function validarControlador() {
         
         // Obtener los valores del formulario
         const usuario = document.getElementById('usuario').value.trim();
-        const password = document.getElementById('password').value.trim();
+        const clave = document.getElementById('password').value.trim();
         
         // Validar que los campos no estén vacíos
-        if (!usuario || !password) {
+        if (!usuario || !clave) {
             mostrarError('Por favor, completa todos los campos');
             return;
         }
@@ -35,7 +35,7 @@ export function validarControlador() {
 
         try {
             // Intentar hacer login (el campo usuario debe ser el email)
-            const resultado = await loginUsuario(usuario, password);
+            const resultado = await loginUsuario(usuario, clave);
             
             if (resultado.success) {
                 // Login exitoso - guardamos los tokens y datos del usuario

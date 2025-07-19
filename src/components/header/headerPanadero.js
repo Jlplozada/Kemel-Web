@@ -10,31 +10,22 @@ export const headerPanadero = () => {
     const menuBtn = document.createElement('button');
     const menuIcon = document.createElement('img');
 
-    // Botones de navegación
+    // Botón de navegación único
     const pedidos = document.createElement('a');
-    const crearProducto = document.createElement('a');
-    const cerrarSesion = document.createElement('a');
 
     logo.src = '../public/kemel.png';
     logo.alt = 'Logo Kemel';
 
-    logoApi.href = '#/inicio';
+    logoApi.href = '#panadero';
     logoApi.appendChild(logo);
 
     pedidos.textContent = 'Pedidos';
-    crearProducto.textContent = 'Crear Producto';
-    cerrarSesion.textContent = 'Cerrar sesión';
-
-    pedidos.setAttribute('href', '#/pedidos');
-    crearProducto.setAttribute('href', '#/crear-producto');
-    cerrarSesion.setAttribute('href', '#/login');
+    pedidos.setAttribute('href', '#pedidos');
 
     divMenu.classList.add('nav-menu');
     divLogo.classList.add('nav-logo');
 
     divMenu.appendChild(pedidos);
-    divMenu.appendChild(crearProducto);
-    divMenu.appendChild(cerrarSesion);
     divLogo.appendChild(logoApi);
 
     menuBtn.classList.add('menu-hamburguesa');
@@ -46,26 +37,12 @@ export const headerPanadero = () => {
         divMenu.classList.toggle('activo');
     });
 
-    // Event listeners para navegación
+    // Interceptar el click para usar el router SPA
     pedidos.addEventListener('click', (e) => {
         e.preventDefault();
         divMenu.classList.remove('activo');
-        navigate('/pedidos');
-    });
-
-    crearProducto.addEventListener('click', (e) => {
-        e.preventDefault();
-        divMenu.classList.remove('activo');
-        navigate('/crear-producto');
-    });
-
-    cerrarSesion.addEventListener('click', (e) => {
-        e.preventDefault();
-        divMenu.classList.remove('activo');
-        // Limpiar tokens y redirigir a login
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        navigate('/login');
+        const ruta = pedidos.getAttribute('href').replace('#', '');
+        navigate(ruta);
     });
 
     barraNavegacion.appendChild(divLogo);

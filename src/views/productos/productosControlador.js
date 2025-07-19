@@ -1,4 +1,4 @@
-
+import {API_URL} from "../../helpers/api.js";
 
 
 // Función para crear una card de producto
@@ -9,7 +9,7 @@ function crearCardProducto(producto) {
 
   // Imagen
   const img = document.createElement("img");
-  img.src = producto.imagen ? producto.imagen : "/img/default.png";
+  img.src = producto.imagen ? producto.imagen : `${API_URL}/img/`;
   img.alt = producto.nombre;
   img.className = "producto-img";
   card.appendChild(img);
@@ -69,7 +69,7 @@ function crearCardProducto(producto) {
 
 export const productosControlador = async function () {
   try {
-    const res = await fetch("http://localhost:5010/productos");
+    const res = await fetch(`${API_URL}/productos`);
     const productos = await res.json();
     const contenedor = document.getElementById("productos-contenedor");
     contenedor.innerHTML = "";

@@ -98,22 +98,46 @@ class CrearProductoControlador {
         }
     }
 
-    async createProduct(formData) {
+    async uploadImage(file) {
+        const formData = new FormData();
+        formData.append('imagen', file);
+
         try {
-            const response = await fetch(`${API_URL}/productos`, {
+            const response = await fetch(`${API_URL}/productos/upload`, {
                 method: 'POST',
-                body: formData // Enviar FormData directamente
+                body: formData
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Error al crear el producto');
+                throw new Error('Error al subir la imagen');
+            }
+
+            const result = await response.json();
+            return result.ruta;
+        } catch (error) {
+            console.error('Error al subir imagen:', error);
+            throw new Error('No se pudo subir la imagen');
+        }
+    }
+
+    async createProduct(productData) {
+        try {
+            const response = await fetch(`${API_URL}/productos`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(productData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al crear el producto');
             }
 
             return await response.json();
         } catch (error) {
             console.error('Error al crear producto:', error);
-            throw new Error(error.message || 'No se pudo crear el producto');
+            throw new Error('No se pudo crear el producto');
         }
     }
 
@@ -132,11 +156,23 @@ class CrearProductoControlador {
         try {
             const formData = new FormData(this.form);
             
-            // Agregar un creado_por temporal (debería venir de la sesión del usuario)
-            formData.append('creado_por', 1); // ID temporal del usuario logueado
+            // Preparar datos del producto
+            const productData = {
+                nombre: formData.get('nombre').trim(),
+                descripcion: formData.get('descripcion').trim(),
+                precio: parseFloat(formData.get('precio')),
+                estado: formData.get('estado'),
+                imagen: null
+            };
 
-            // Crear producto con FormData (incluye la imagen)
-            const result = await this.createProduct(formData);
+            // Subir imagen si existe
+            const imagenFile = formData.get('imagen');
+            if (imagenFile && imagenFile.size > 0) {
+                productData.imagen = await this.uploadImage(imagenFile);
+            }
+
+            // Crear producto
+            const result = await this.createProduct(productData);
             
             this.showMessage('Producto creado exitosamente', 'exito');
             this.resetForm();
