@@ -1,4 +1,12 @@
-<div class="crear-producto-container"></div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Producto</title>
+</head>
+<body>
+<div class="crear-producto-container">
     <div class="form-header">
         <h2 id="titulo-form">Crear Nuevo Producto</h2>
         <p id="subtitulo-form">Completa la información para agregar un nuevo producto al catálogo</p>
@@ -54,15 +62,15 @@
                     class="file-input"
                 >
                 <label for="imagen" class="file-label">
-                    <span class="file-icon">📷</span>
-                    <span class="file-text">Seleccionar imagen</span>
+                    <span class="file-icon"> </span>
+                    Seleccionar
                 </label>
                 <div class="file-preview" id="preview-container" style="display: none;">
                     <img id="image-preview" src="" alt="Vista previa">
                     <button type="button" class="remove-image" id="remove-image">×</button>
                 </div>
+                <small class="file-hint">JPG, PNG</small>
             </div>
-            <small class="file-hint">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</small>
         </div>
 
         <div class="form-group">
@@ -84,3 +92,5 @@
 
     <div id="mensaje-resultado" class="mensaje" style="display: none;"></div>
 </div>
+</body>
+</html>

@@ -104,7 +104,7 @@ const routes = {
         controlador: loadDetallePedido,
         private: true,
     },
-    "crear-producto": {
+    "crearproducto": {
         template: "crearproducto/index.html",
         controlador: loadCrearProducto,
         private: true,

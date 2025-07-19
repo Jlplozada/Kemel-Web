@@ -1,6 +1,5 @@
 import { API_URL } from '../../helpers/api.js';
 import { getData } from '../../helpers/auth.js';
-import { alertaExito, alertaError, alertaConfirmacion, alertaLoading, cerrarAlerta, toast } from '../../helpers/alertas.js';
 
 class CrearProductoControlador {
     constructor() {
@@ -40,7 +39,7 @@ class CrearProductoControlador {
 
     async loadProductData() {
         try {
-            alertaLoading('Cargando', 'Obteniendo datos del producto...');
+            console.log('Cargando datos del producto...');
             
             const { token } = getData();
             const response = await fetch(`${API_URL}/productos/${this.productId}`, {
@@ -55,7 +54,6 @@ class CrearProductoControlador {
             }
 
             const resultado = await response.json();
-            cerrarAlerta();
 
             if (resultado.success) {
                 this.fillForm(resultado.data);
@@ -63,9 +61,8 @@ class CrearProductoControlador {
                 throw new Error(resultado.error || 'Error al cargar el producto');
             }
         } catch (error) {
-            cerrarAlerta();
             console.error('Error al cargar producto:', error);
-            await alertaError('Error', error.message || 'No se pudo cargar el producto');
+            alert(error.message || 'No se pudo cargar el producto');
             window.location.hash = 'administrar-productos';
         }
     }
@@ -115,13 +112,13 @@ class CrearProductoControlador {
 
         // Validar tipo de archivo
         if (!file.type.startsWith('image/')) {
-            alertaError('Archivo no válido', 'Por favor selecciona una imagen válida');
+            alert('Por favor selecciona una imagen válida');
             return;
         }
 
         // Validar tamaño (5MB máximo)
         if (file.size > 5 * 1024 * 1024) {
-            alertaError('Archivo muy grande', 'La imagen no debe superar los 5MB');
+            alert('La imagen no debe superar los 5MB');
             return;
         }
 
@@ -163,81 +160,41 @@ class CrearProductoControlador {
         }
 
         const action = this.editMode ? 'Actualizando' : 'Creando';
-        alertaLoading(`${action} Producto`, `Por favor espera mientras se ${action.toLowerCase()} el producto...`);
+        console.log(`${action} producto...`);
 
         try {
             const formData = new FormData(this.form);
-            
-            const productData = {
-                nombre: formData.get('nombre').trim(),
-                descripcion: formData.get('descripcion').trim(),
-                precio: parseFloat(formData.get('precio'))
-            };
-
-            // Manejar imagen si se seleccionó una nueva
-            const imagenFile = formData.get('imagen');
-            if (imagenFile && imagenFile.size > 0) {
-                productData.imagen = await this.uploadImage(imagenFile);
-            }
 
             let result;
             if (this.editMode) {
-                result = await this.updateProduct(productData);
+                result = await this.updateProduct(formData);
             } else {
-                result = await this.createProduct(productData);
+                result = await this.createProduct(formData);
             }
             
-            cerrarAlerta();
-            const successMessage = this.editMode ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente';
-            await alertaExito('¡Éxito!', successMessage);
+            console.log('Producto procesado exitosamente');
+            const successMessage = this.editMode ? 'Producto actualizado' : 'Producto creado';
+            alert(successMessage);
             
             // Redirigir a administrar productos
             window.location.hash = 'administrar-productos';
 
         } catch (error) {
             console.error('Error:', error);
-            cerrarAlerta();
             const errorMessage = this.editMode ? 'No se pudo actualizar el producto' : 'No se pudo crear el producto';
-            await alertaError('Error', error.message || errorMessage);
+            alert(error.message || errorMessage);
         }
     }
 
-    async uploadImage(file) {
-        const formData = new FormData();
-        formData.append('imagen', file);
-
-        try {
-            const { token } = getData();
-            const response = await fetch(`${API_URL}/productos/upload`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al subir la imagen');
-            }
-
-            const result = await response.json();
-            return result.ruta || result.filename;
-        } catch (error) {
-            console.error('Error al subir imagen:', error);
-            throw new Error('No se pudo subir la imagen');
-        }
-    }
-
-    async createProduct(productData) {
+    async createProduct(formData) {
         try {
             const { token } = getData();
             const response = await fetch(`${API_URL}/productos`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(productData)
+                body: formData
             });
 
             if (!response.ok) {
@@ -251,16 +208,15 @@ class CrearProductoControlador {
         }
     }
 
-    async updateProduct(productData) {
+    async updateProduct(formData) {
         try {
             const { token } = getData();
             const response = await fetch(`${API_URL}/productos/${this.productId}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(productData)
+                body: formData
             });
 
             if (!response.ok) {
@@ -276,14 +232,9 @@ class CrearProductoControlador {
 
     async handleCancel() {
         const action = this.editMode ? 'edición' : 'creación';
-        const resultado = await alertaConfirmacion(
-            `¿Cancelar ${action}?`,
-            `¿Estás seguro de que quieres cancelar? Se perderán todos los cambios.`,
-            'Sí, cancelar',
-            'Continuar editando'
-        );
+        const confirmacion = confirm(`¿Cancelar ${action}? Se perderán todos los cambios.`);
         
-        if (resultado.isConfirmed) {
+        if (confirmacion) {
             window.location.hash = 'administrar-productos';
         }
     }
