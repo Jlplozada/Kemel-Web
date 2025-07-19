@@ -1,5 +1,6 @@
 import { navigate } from '../../router/router.js';
 import { clearAuth } from '../../helpers/auth.js';
+import { renderHeaderPorRol } from '../../helpers/gestionRoles.js';
 
 const headerAdministrador = () => {
     const barraNavegacion = document.createElement('nav');
@@ -14,7 +15,6 @@ const headerAdministrador = () => {
     const pedidos = document.createElement('a');
     const usuarios = document.createElement('a');
     const productos = document.createElement('a');
-    const crearProducto = document.createElement('a');
     const cerrarSesion = document.createElement('a');
 
     logo.src = '../public/kemel.png';
@@ -26,13 +26,11 @@ const headerAdministrador = () => {
     pedidos.textContent = 'Gestionar Pedidos';
     usuarios.textContent = 'Gestionar Usuarios';
     productos.textContent = 'Administrar Productos';
-    crearProducto.textContent = 'Crear Producto';
     cerrarSesion.textContent = 'Cerrar Sesión';
 
     pedidos.setAttribute('href', '#admin-pedidos');
     usuarios.setAttribute('href', '#admin-usuarios');
     productos.setAttribute('href', '#administrar-productos');
-    crearProducto.setAttribute('href', '#crearproducto');
     cerrarSesion.setAttribute('href', '#logout');
 
     divMenu.classList.add('nav-menu');
@@ -41,7 +39,6 @@ const headerAdministrador = () => {
     divMenu.appendChild(pedidos);
     divMenu.appendChild(usuarios);
     divMenu.appendChild(productos);
-    divMenu.appendChild(crearProducto);
     divMenu.appendChild(cerrarSesion);
     divLogo.appendChild(logoApi);
 
@@ -73,16 +70,12 @@ const headerAdministrador = () => {
         navigate('administrar-productos');
     });
 
-    crearProducto.addEventListener('click', (e) => {
-        e.preventDefault();
-        divMenu.classList.remove('activo');
-        navigate('crearproducto');
-    });
-
     cerrarSesion.addEventListener('click', (e) => {
         e.preventDefault();
         divMenu.classList.remove('activo');
         clearAuth();
+        // Re-renderizar el header para usuario no autenticado
+        renderHeaderPorRol(null, false);
         navigate('login');
     });
 

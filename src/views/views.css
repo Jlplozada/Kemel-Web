@@ -1,3 +1,7 @@
 @import "./inicio/inicio.css";
 @import "./productos/productos.css";
 @import "./catalogo/catalogo.css";
+@import "./pedidos-pendientes/pedidosPendientes.css";
+@import "./admin-usuarios/adminUsuarios.css";
+@import "./administrar-productos/administrarProductos.css";
+@import "./detalle-pedido/detallePedido.css";

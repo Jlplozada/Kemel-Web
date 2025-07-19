@@ -11,6 +11,7 @@ import { cuentaControlador } from "../views/cuenta/cuentaControlador.js";
 import { pedidosPendientesControlador } from "../views/pedidos-pendientes/pedidosPendientesControlador.js";
 import { adminPedidosControlador } from "../views/admin-pedidos/adminPedidosControlador.js";
 import { adminUsuariosControlador } from "../views/admin-usuarios/adminUsuariosControlador.js";
+import { loadDetallePedido } from "../views/detalle-pedido/detallePedidoControlador.js";
 
 const routes = {
     login: {
@@ -91,6 +92,16 @@ const routes = {
     "admin-usuarios": {
         template: "admin-usuarios/index.html",
         controlador: adminUsuariosControlador,
+        private: true,
+    },
+    "administrar-productos": {
+        template: "administrar-productos/index.html",
+        controlador: loadAdministrarProductos,
+        private: true,
+    },
+    "detalle-pedido": {
+        template: "detalle-pedido/index.html",
+        controlador: loadDetallePedido,
         private: true,
     },
     "crear-producto": {

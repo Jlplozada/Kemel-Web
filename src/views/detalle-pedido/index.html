@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Pedido</title>
+</head>
+<body>
+    <div class="detalle-pedido-container">
+        <!-- Header con botón volver -->
+        <div class="header-detalle">
+            <button id="btn-volver" class="btn-volver">
+                ← Volver a Pedidos
+            </button>
+            <h2 id="titulo-pedido">Detalles del Pedido #<span id="numero-pedido">-</span></h2>
+        </div>
+
+        <!-- Información del pedido -->
+        <div class="info-pedido-section">
+            <div class="card-info">
+                <h3>📋 Información del Pedido</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>ID del Pedido:</label>
+                        <span id="pedido-id">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Fecha de Creación:</label>
+                        <span id="pedido-fecha">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Estado Actual:</label>
+                        <span id="pedido-estado" class="estado-badge">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Total del Pedido:</label>
+                        <span id="pedido-total" class="precio-total">$0</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Dirección de Entrega:</label>
+                        <span id="pedido-direccion">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Notas Adicionales:</label>
+                        <span id="pedido-notas">Sin notas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del cliente -->
+        <div class="info-cliente-section">
+            <div class="card-info">
+                <h3>👤 Información del Cliente</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Nombre Completo:</label>
+                        <span id="cliente-nombre">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Correo Electrónico:</label>
+                        <span id="cliente-correo">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Teléfono:</label>
+                        <span id="cliente-telefono">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Dirección Registrada:</label>
+                        <span id="cliente-direccion">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos del pedido -->
+        <div class="productos-section">
+            <div class="card-info">
+                <h3>🛒 Productos del Pedido</h3>
+                <div class="tabla-productos-detalle">
+                    <table class="tabla-productos">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Producto</th>
+                                <th>Descripción</th>
+                                <th>Precio Unitario</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-productos">
+                            <!-- Los productos se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones del pedido -->
+        <div class="acciones-section">
+            <div class="card-info">
+                <h3>⚙️ Acciones del Pedido</h3>
+                <div class="acciones-buttons">
+                    <select id="cambiar-estado" class="select-estado">
+                        <option value="">Cambiar Estado</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="aprobado">Aprobado</option>
+                        <option value="preparado">Preparado</option>
+                        <option value="entregado">Entregado</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                    <button id="btn-actualizar-estado" class="btn-accion btn-actualizar">
+                        Actualizar Estado
+                    </button>
+                    <button id="btn-eliminar-pedido" class="btn-accion btn-eliminar">
+                        Eliminar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de carga -->
+    <div id="loading-detalle" class="loading-container" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Cargando detalles del pedido...</p>
+    </div>
+</body>
+</html>

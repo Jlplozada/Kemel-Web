@@ -44,15 +44,43 @@ const cargarPedidosAdmin = async (filtroEstado = '') => {
         const resultado = await response.json();
         cerrarAlerta();
 
+        console.log("=== RESPUESTA DEL SERVIDOR ADMIN ===");
+        console.log("Success:", resultado.success);
+        console.log("Datos recibidos:", resultado.data);
+        console.log("Cantidad de pedidos:", resultado.data ? resultado.data.length : 0);
+
         if (resultado.success && resultado.data.length > 0) {
             tbody.innerHTML = '';
             mensajeSinPedidos.style.display = 'none';
 
-            resultado.data.forEach(pedido => {
-                const fila = crearFilaPedidoAdmin(pedido);
-                tbody.appendChild(fila);
+            // Procesar cada pedido y sus productos como en pedidos pendientes
+            resultado.data.forEach((pedido, pedidoIndex) => {
+                console.log(`=== PROCESANDO PEDIDO ADMIN ${pedidoIndex + 1} ===`);
+                console.log("Pedido:", pedido);
+                console.log("Productos del pedido:", pedido.productos);
+                
+                // Determinar si el pedido es par o impar para el color de fondo
+                const esPedidoPar = pedidoIndex % 2 === 0;
+                const clasePedido = esPedidoPar ? 'pedido-par' : 'pedido-impar';
+                
+                if (pedido.productos && pedido.productos.length > 0) {
+                    // Crear una fila por cada producto del pedido
+                    pedido.productos.forEach((producto, index) => {
+                        console.log(`Creando fila para producto ${index + 1}:`, producto);
+                        const fila = crearFilaProductoAdmin(pedido, producto, index === 0, clasePedido);
+                        tbody.appendChild(fila);
+                    });
+                } else {
+                    // Si no hay productos, crear una fila vacía
+                    console.log("Pedido sin productos, creando fila vacía");
+                    const fila = crearFilaProductoAdmin(pedido, null, true, clasePedido);
+                    tbody.appendChild(fila);
+                }
             });
         } else {
+            console.log("=== NO HAY PEDIDOS ADMIN ===");
+            console.log("Success:", resultado.success);
+            console.log("Data length:", resultado.data ? resultado.data.length : "data is null/undefined");
             tbody.innerHTML = '';
             mensajeSinPedidos.style.display = 'block';
         }
@@ -63,48 +91,71 @@ const cargarPedidosAdmin = async (filtroEstado = '') => {
     }
 };
 
-// Función para crear una fila de pedido en la tabla de admin
-const crearFilaPedidoAdmin = (pedido) => {
+// Función para crear una fila por producto en la tabla de admin
+const crearFilaProductoAdmin = (pedido, producto, mostrarDatosPedido, clasePedido = '') => {
     const fila = document.createElement('tr');
+    
+    // Agregar la clase para el color de fondo del pedido
+    if (clasePedido) {
+        fila.className = clasePedido;
+    }
 
     // Formatear fecha
     const fecha = new Date(pedido.fecha_pedido).toLocaleDateString('es-CO');
     
-    // Formatear productos
-    const productosTexto = pedido.productos ? 
-        pedido.productos.map(p => `${p.nombre} (x${p.cantidad})`).join(', ') : 
-        'Sin detalles';
+    // Formatear total
+    const totalFormateado = (pedido.total || 0).toLocaleString('es-CO');
 
-    // Clase CSS según estado
-    const estadoClass = `estado-${pedido.estado}`;
-
-    fila.innerHTML = `
-        <td>${pedido.id}</td>
-        <td>${pedido.nombre_usuario || 'Cliente'}</td>
-        <td>${fecha}</td>
-        <td><span class="${estadoClass}">${pedido.estado}</span></td>
-        <td>${pedido.direccion_entrega || 'Sin dirección'}</td>
-        <td>$${(pedido.total || 0).toLocaleString('es-CO')}</td>
-        <td class="productos-lista" title="${productosTexto}">${productosTexto}</td>
-        <td>
-            ${crearBotonesAccionAdmin(pedido)}
-        </td>
-    `;
+    if (producto) {
+        fila.innerHTML = `
+            <td>${mostrarDatosPedido ? pedido.id : ''}</td>
+            <td>${mostrarDatosPedido ? (pedido.nombre_usuario || 'Cliente') : ''}</td>
+            <td>${mostrarDatosPedido ? fecha : ''}</td>
+            <td>${mostrarDatosPedido ? crearSelectEstado(pedido) : ''}</td>
+            <td>${mostrarDatosPedido ? (pedido.direccion_entrega || 'Sin dirección') : ''}</td>
+            <td>${mostrarDatosPedido ? `$${totalFormateado}` : ''}</td>
+            <td>${producto.cantidad}x ${producto.nombre}</td>
+            <td>${mostrarDatosPedido ? crearBotonesAccionAdmin(pedido) : ''}</td>
+        `;
+    } else {
+        // Si no hay producto
+        fila.innerHTML = `
+            <td>${pedido.id}</td>
+            <td>${pedido.nombre_usuario || 'Cliente'}</td>
+            <td>${fecha}</td>
+            <td>${crearSelectEstado(pedido)}</td>
+            <td>${pedido.direccion_entrega || 'Sin dirección'}</td>
+            <td>$${totalFormateado}</td>
+            <td>Sin productos</td>
+            <td>${crearBotonesAccionAdmin(pedido)}</td>
+        `;
+    }
 
     return fila;
+};
+
+// Función para crear select de estado
+const crearSelectEstado = (pedido) => {
+    const estados = ['pendiente', 'aprobado', 'preparado', 'entregado', 'cancelado'];
+    
+    let selectHTML = `<select class="select-estado-admin" onchange="cambiarEstadoPedidoAdmin(${pedido.id}, this.value)">`;
+    
+    estados.forEach(estado => {
+        const selected = estado === pedido.estado ? 'selected' : '';
+        const estadoCapitalizado = estado.charAt(0).toUpperCase() + estado.slice(1);
+        selectHTML += `<option value="${estado}" ${selected}>${estadoCapitalizado}</option>`;
+    });
+    
+    selectHTML += '</select>';
+    return selectHTML;
 };
 
 // Función para crear botones de acción para admin
 const crearBotonesAccionAdmin = (pedido) => {
     return `
-        <select class="select-estado" onchange="cambiarEstadoPedidoAdmin(${pedido.id}, this.value)">
-            <option value="">Cambiar estado</option>
-            <option value="pendiente" ${pedido.estado === 'pendiente' ? 'disabled' : ''}>Pendiente</option>
-            <option value="aprobado" ${pedido.estado === 'aprobado' ? 'disabled' : ''}>Aprobado</option>
-            <option value="preparado" ${pedido.estado === 'preparado' ? 'disabled' : ''}>Preparado</option>
-            <option value="entregado" ${pedido.estado === 'entregado' ? 'disabled' : ''}>Entregado</option>
-            <option value="cancelado" ${pedido.estado === 'cancelado' ? 'disabled' : ''}>Cancelado</option>
-        </select>
+        <button class="btn-accion btn-detalles" onclick="verDetallesPedido(${pedido.id})">
+            Detalles
+        </button>
         <button class="btn-accion btn-eliminar" onclick="eliminarPedido(${pedido.id})">
             Eliminar
         </button>
@@ -129,8 +180,6 @@ const configurarFiltros = () => {
 
 // Función global para cambiar estado de pedido desde admin
 window.cambiarEstadoPedidoAdmin = async (pedidoId, nuevoEstado) => {
-    if (!nuevoEstado) return;
-
     try {
         alertaLoading('Actualizando', `Cambiando estado a ${nuevoEstado}...`);
 
@@ -149,16 +198,22 @@ window.cambiarEstadoPedidoAdmin = async (pedidoId, nuevoEstado) => {
 
         if (resultado.success) {
             await alertaExito('¡Éxito!', `Pedido actualizado a ${nuevoEstado}`);
-            // Recargar la tabla
+            // Recargar la tabla manteniendo el filtro actual
             const filtroActual = document.getElementById('filtro-estado').value;
             await cargarPedidosAdmin(filtroActual);
         } else {
             await alertaError('Error', resultado.error || 'Error al actualizar el pedido');
+            // Recargar para revertir el select al estado anterior
+            const filtroActual = document.getElementById('filtro-estado').value;
+            await cargarPedidosAdmin(filtroActual);
         }
     } catch (error) {
         cerrarAlerta();
         console.error('Error al cambiar estado del pedido:', error);
         await alertaError('Error', 'Error al actualizar el estado del pedido');
+        // Recargar para revertir el select al estado anterior
+        const filtroActual = document.getElementById('filtro-estado').value;
+        await cargarPedidosAdmin(filtroActual);
     }
 };
 
@@ -192,6 +247,12 @@ window.eliminarPedido = async (pedidoId) => {
         console.error('Error al eliminar pedido:', error);
         await alertaError('Error', 'Error al eliminar el pedido');
     }
+};
+
+// Función global para ver detalles del pedido
+window.verDetallesPedido = (pedidoId) => {
+    // Navegar a la vista de detalles con el ID del pedido
+    window.location.hash = `detalle-pedido?id=${pedidoId}`;
 };
 
 // Función para exportar reporte

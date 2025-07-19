@@ -1,0 +1,213 @@
+/* Importar estilos comunes de admin-pedidos */
+@import '../admin-pedidos/adminPedidos.css';
+
+/* Header section con botón crear */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--primary-color, #8B4513);
+}
+
+.titulo-section h2 {
+    color: var(--text-color);
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 600;
+    font-family: var(--font-family);
+}
+
+.titulo-section p {
+    color: var(--tercer-color);
+    margin: 0;
+    font-size: 1rem;
+    font-family: var(--font-family);
+}
+
+.btn-crear-producto {
+    background: var(--primary-color, #8B4513);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(139, 69, 19, 0.2);
+    font-family: var(--font-family);
+}
+
+.btn-crear-producto:hover {
+    background: var(--primary-dark, #6F3611);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+}
+
+/* Estilos específicos para admin-productos */
+.admin-productos-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-productos-container h2 {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-family: var(--font-family);
+}
+
+.admin-productos-container p {
+    text-align: center;
+    color: var(--tercer-color);
+    margin-bottom: 2rem;
+    font-family: var(--font-family);
+}
+
+/* Estilos específicos para la tabla de productos */
+.tabla-productos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.tabla-productos th,
+.tabla-productos td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabla-productos th {
+    background-color: lightgray;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+.tabla-productos td {
+    text-align: center;
+    border: 1px solid black;
+}
+
+/* Alternar colores por producto */
+.tabla-productos tr.pedido-par {
+    background-color: var(--tercer-color); /* Gris oscuro de la paleta */
+    color: white;
+}
+
+.tabla-productos tr.pedido-impar {
+    background-color: var(--segundo-color); /* Azul claro de la paleta */
+    color: white;
+}
+
+/* Estilos para las imágenes de productos */
+.tabla-productos img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Estilos para la descripción */
+.tabla-productos td:nth-child(4) {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Mensaje cuando no hay productos */
+.mensaje-vacio {
+    text-align: center;
+    padding: 2rem;
+    color: var(--tercer-color);
+    font-style: italic;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+/* Estilos responsive específicos para productos */
+@media (max-width: 768px) {
+    .admin-productos-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .titulo-section h2 {
+        font-size: 1.5rem;
+    }
+    
+    .btn-crear-producto {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.1rem;
+    }
+    
+    .tabla-productos {
+        font-size: 12px;
+    }
+    
+    .tabla-productos th,
+    .tabla-productos td {
+        padding: 8px 4px;
+    }
+    
+    .tabla-productos img {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .tabla-productos td:nth-child(4) {
+        max-width: 100px;
+    }
+}
+
+/* Estilos para badges de estado */
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.estado-activo {
+    background-color: var(--success-bg, #e8f5e8);
+    color: var(--success-text, #2d5016);
+    border: 1px solid var(--success-border, #4caf50);
+}
+
+.estado-inactivo {
+    background-color: var(--warning-bg, #fff3cd);
+    color: var(--warning-text, #856404);
+    border: 1px solid var(--warning-border, #ffc107);
+}
+
+.estado-eliminado {
+    background-color: var(--error-bg, #f8d7da);
+    color: var(--error-text, #721c24);
+    border: 1px solid var(--error-border, #dc3545);
+}
+
+.estado-default {
+    background-color: var(--secondary-bg, #f8f9fa);
+    color: var(--secondary-text, #6c757d);
+    border: 1px solid var(--secondary-border, #dee2e6);
+}

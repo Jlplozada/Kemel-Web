@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Productos - Admin</title>
+</head>
+<body>
+    <div class="admin-productos-container">
+        <div class="header-section">
+            <div class="titulo-section">
+                <h2>Administrar Productos</h2>
+                <p>Gestión completa de todos los productos disponibles</p>
+            </div>
+            <button id="btn-crear-producto" class="btn-crear-producto">
+                + Crear Producto
+            </button>
+        </div>
+        
+        <div class="filtros-container">
+            <!-- Filtros removidos según solicitud -->
+        </div>
+        
+        <div class="tabla-container">
+            <table class="tabla-productos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-admin-productos">
+                    <!-- Los productos se cargarán aquí dinámicamente -->
+                </tbody>
+            </table>
+            
+            <div id="mensaje-sin-productos" class="mensaje-vacio" style="display: none;">
+                <p>No hay productos que mostrar</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

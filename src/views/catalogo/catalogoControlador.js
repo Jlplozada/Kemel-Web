@@ -147,28 +147,35 @@ function agregarBotonCrearPedido(contenedor) {
 
 // Función para recopilar productos seleccionados
 function recopilarProductosSeleccionados() {
+  // 1. Obtener todas las tarjetas de productos del DOM
   const cards = document.querySelectorAll(".catalogo-card");
   const productosSeleccionados = [];
   
+  // 2. Recorrer cada tarjeta para verificar qué productos tienen cantidad > 0
   cards.forEach((card, index) => {
+    // 2.1 Obtener la cantidad seleccionada del contador
     const cantidad = parseInt(card.querySelector(".cantidad-span").textContent);
+    
+    // 2.2 Solo procesar productos que tienen cantidad mayor a 0
     if (cantidad > 0) {
+      // 2.3 Extraer información del producto desde el DOM
       const nombre = card.querySelector("h3").textContent;
       const precioTexto = card.querySelector(".catalogo-precio").textContent;
       
-      // Extraer el precio numérico del texto para pesos colombianos
-      // El texto viene como "$ 26.500" y necesitamos convertirlo a 26500
-      let precio = precioTexto.replace(/[$\s]/g, ''); // Remover $ y espacios
-      precio = precio.replace(/\./g, ''); // Remover puntos (separadores de miles)
-      precio = parseFloat(precio); // Convertir a número
+      // 2.4 Convertir el precio formateado a número
+      // Ejemplo: "$ 26.500" debe convertirse a 26500
+      let precio = precioTexto.replace(/[$\s]/g, ''); // Remover símbolo $ y espacios
+      precio = precio.replace(/\./g, ''); // Remover puntos separadores de miles
+      precio = parseFloat(precio); // Convertir string a número
       
       console.log(`Producto: ${nombre}, Texto original: "${precioTexto}", Precio parseado: ${precio}`);
       
+      // 2.5 Crear objeto del producto con subtotal calculado
       productosSeleccionados.push({
-        nombre,
-        precio,
-        cantidad,
-        subtotal: precio * cantidad
+        nombre,           // Nombre del producto
+        precio,          // Precio unitario (número)
+        cantidad,        // Cantidad seleccionada
+        subtotal: precio * cantidad  // Precio total de este producto
       });
     }
   });
@@ -179,48 +186,62 @@ function recopilarProductosSeleccionados() {
 // Función para crear el pedido en la base de datos
 async function crearPedidoEnBaseDatos(productosSeleccionados) {
   try {
+    // 1. Mostrar alerta de carga mientras se procesa
     alertaLoading("Creando pedido", "Procesando tu pedido...");
     
+    // 2. Obtener información del usuario autenticado
     const usuario = getUsuario();
     
-    // Calcular el total del pedido
+    // 3. CALCULAR EL TOTAL DEL PEDIDO
+    // Suma todos los subtotales de los productos seleccionados
+    // Ejemplo: si hay 3 productos con subtotales 10000, 15000, 8000
+    // el total será: 10000 + 15000 + 8000 = 33000
     const total = productosSeleccionados.reduce((sum, producto) => sum + producto.subtotal, 0);
     
-    // Datos del pedido
+    // 4. Preparar datos del pedido para enviar al servidor
     const pedidoData = {
       nombre: `Pedido de ${usuario.nombre}`,
       usuario_id: usuario.id,
       direccion_entrega: usuario.direccion || '',
       ciudad_id: usuario.ciudad_id || 1,
-      total: total,
+      total: total,                    // Total calculado arriba
       estado: 'pendiente',
-      productos: productosSeleccionados
+      productos: productosSeleccionados // Array con todos los productos
     };
     
     console.log("Datos del pedido a enviar:", pedidoData);
     
-    // Crear el pedido mediante la API
+    // 5. Enviar el pedido al servidor mediante la API
     const result = await authenticatedRequest(`${API_URL}/pedidos`, {
       method: 'POST',
       body: JSON.stringify(pedidoData)
     });
     
+    // 6. Cerrar la alerta de carga
     cerrarAlerta();
     
+    // 7. MOSTRAR RESULTADO AL USUARIO
     if (result.success) {
-      // Formatear el total en pesos colombianos
+      // 7.1 FORMATEAR EL TOTAL PARA MOSTRAR
+      // Convertir número a formato colombiano con separadores de miles
+      // Ejemplo: 33000 se convierte en "33.000"
       const totalFormateado = total.toLocaleString('es-CO');
+      
+      // 7.2 MOSTRAR ALERTA DE ÉXITO CON EL TOTAL
+      // Esta es la alerta que muestra el total de compra al usuario
       await alertaExito("¡Pedido creado!", `Tu pedido ha sido creado exitosamente. Total: $${totalFormateado}`);
       
-      // Limpiar el carrito (resetear contadores)
+      // 7.3 Limpiar el carrito después del éxito
       limpiarCarrito();
       
       console.log("Pedido creado exitosamente:", result.data);
     } else {
+      // 7.4 Mostrar error si el servidor rechaza el pedido
       await alertaError("Error al crear pedido", result.error || "No se pudo crear el pedido");
     }
     
   } catch (error) {
+    // 8. Manejar errores inesperados
     cerrarAlerta();
     console.error("Error al crear pedido:", error);
     await alertaError("Error inesperado", "Ocurrió un error al crear el pedido. Intenta nuevamente.");

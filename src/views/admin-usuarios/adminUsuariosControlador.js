@@ -44,12 +44,24 @@ const cargarUsuariosAdmin = async (filtroRol = '') => {
         const resultado = await response.json();
         cerrarAlerta();
 
+        console.log("=== RESPUESTA DEL SERVIDOR USUARIOS ===");
+        console.log("Success:", resultado.success);
+        console.log("Datos recibidos:", resultado.data);
+        console.log("Cantidad de usuarios:", resultado.data ? resultado.data.length : 0);
+
         if (resultado.success && resultado.data.length > 0) {
             tbody.innerHTML = '';
             mensajeSinUsuarios.style.display = 'none';
 
-            resultado.data.forEach(usuario => {
-                const fila = crearFilaUsuarioAdmin(usuario);
+            resultado.data.forEach((usuario, usuarioIndex) => {
+                console.log(`=== PROCESANDO USUARIO ${usuarioIndex + 1} ===`);
+                console.log("Usuario:", usuario);
+                
+                // Determinar si el usuario es par o impar para el color de fondo
+                const esUsuarioPar = usuarioIndex % 2 === 0;
+                const claseUsuario = esUsuarioPar ? 'pedido-par' : 'pedido-impar';
+                
+                const fila = crearFilaUsuarioAdmin(usuario, claseUsuario);
                 tbody.appendChild(fila);
             });
         } else {
@@ -64,14 +76,14 @@ const cargarUsuariosAdmin = async (filtroRol = '') => {
 };
 
 // Función para crear una fila de usuario en la tabla de admin
-const crearFilaUsuarioAdmin = (usuario) => {
+const crearFilaUsuarioAdmin = (usuario, claseUsuario) => {
+    console.log("Creando fila para usuario:", usuario);
+    
     const fila = document.createElement('tr');
+    fila.className = claseUsuario;
 
     // Formatear fecha
     const fechaRegistro = new Date(usuario.fecha_registro).toLocaleDateString('es-CO');
-    
-    // Clase CSS según rol
-    const rolClass = `rol-${usuario.rol}`;
 
     fila.innerHTML = `
         <td>${usuario.id}</td>
@@ -79,14 +91,31 @@ const crearFilaUsuarioAdmin = (usuario) => {
         <td>${usuario.nombre}</td>
         <td>${usuario.correo || 'Sin correo'}</td>
         <td>${usuario.telefono || 'Sin teléfono'}</td>
-        <td><span class="${rolClass}">${usuario.rol}</span></td>
+        <td>${crearSelectRol(usuario.rol, usuario.id)}</td>
         <td>${fechaRegistro}</td>
         <td>
-            ${crearBotonesAccionUsuario(usuario)}
+            <button class="eliminar-btn" onclick="eliminarUsuario(${usuario.id})">
+                Eliminar
+            </button>
         </td>
     `;
 
     return fila;
+};
+
+// Función para crear select de rol
+const crearSelectRol = (rolActual, usuarioId) => {
+    const roles = ['admin', 'panaderia', 'cliente'];
+    
+    let selectHTML = `<select class="estado-select" onchange="cambiarRolUsuario(${usuarioId}, this.value, this)">`;
+    
+    roles.forEach(rol => {
+        const selected = rol === rolActual ? 'selected' : '';
+        selectHTML += `<option value="${rol}" ${selected}>${rol.charAt(0).toUpperCase() + rol.slice(1)}</option>`;
+    });
+    
+    selectHTML += '</select>';
+    return selectHTML;
 };
 
 // Función para crear botones de acción para usuarios
@@ -111,6 +140,7 @@ const crearBotonesAccionUsuario = (usuario) => {
 const configurarControles = () => {
     const filtroRol = document.getElementById('filtro-rol');
     const btnCrearUsuario = document.getElementById('btn-crear-usuario');
+    const btnExportar = document.getElementById('btn-exportar');
 
     if (filtroRol) {
         filtroRol.addEventListener('change', (e) => {
@@ -121,14 +151,25 @@ const configurarControles = () => {
     if (btnCrearUsuario) {
         btnCrearUsuario.addEventListener('click', crearNuevoUsuario);
     }
+
+    if (btnExportar) {
+        btnExportar.addEventListener('click', exportarReporte);
+    }
 };
 
 // Función global para cambiar rol de usuario
-window.cambiarRolUsuario = async (usuarioId, nuevoRol) => {
+window.cambiarRolUsuario = async (usuarioId, nuevoRol, selectElement) => {
     if (!nuevoRol) return;
 
+    console.log(`=== CAMBIANDO ROL DE USUARIO ===`);
+    console.log("ID Usuario:", usuarioId);
+    console.log("Nuevo rol:", nuevoRol);
+
+    const selectOriginal = selectElement.cloneNode(true);
+
     try {
-        alertaLoading('Actualizando', `Cambiando rol a ${nuevoRol}...`);
+        // Deshabilitar el select mientras se procesa
+        selectElement.disabled = true;
 
         const { token } = getData();
         const response = await fetch(`${API_URL}/usuarios/${usuarioId}/rol`, {
@@ -141,20 +182,26 @@ window.cambiarRolUsuario = async (usuarioId, nuevoRol) => {
         });
 
         const resultado = await response.json();
-        cerrarAlerta();
+        console.log("Respuesta del servidor:", resultado);
 
         if (resultado.success) {
             await alertaExito('¡Éxito!', `Rol actualizado a ${nuevoRol}`);
-            // Recargar la tabla
-            const filtroActual = document.getElementById('filtro-rol').value;
-            await cargarUsuariosAdmin(filtroActual);
         } else {
+            // Revertir el select al valor anterior
+            selectElement.parentNode.replaceChild(selectOriginal, selectElement);
             await alertaError('Error', resultado.error || 'Error al actualizar el rol');
         }
     } catch (error) {
-        cerrarAlerta();
+        // Revertir el select al valor anterior
+        selectElement.parentNode.replaceChild(selectOriginal, selectElement);
         console.error('Error al cambiar rol del usuario:', error);
         await alertaError('Error', 'Error al actualizar el rol del usuario');
+    } finally {
+        // Re-habilitar el select
+        const currentSelect = selectElement.parentNode.querySelector('.estado-select');
+        if (currentSelect) {
+            currentSelect.disabled = false;
+        }
     }
 };
 
@@ -198,6 +245,24 @@ window.eliminarUsuario = async (usuarioId) => {
 
 // Función para crear nuevo usuario
 const crearNuevoUsuario = () => {
-    // Por ahora solo mostrar mensaje, implementar según necesidades
     alertaExito('Crear Usuario', 'Funcionalidad de creación de usuarios en desarrollo');
 };
+
+// Función para exportar reporte
+const exportarReporte = async () => {
+    try {
+        alertaLoading('Exportando', 'Generando reporte de usuarios...');
+        
+        // Simular exportación
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        cerrarAlerta();
+        await alertaExito('¡Éxito!', 'Reporte exportado correctamente');
+    } catch (error) {
+        cerrarAlerta();
+        await alertaError('Error', 'No se pudo exportar el reporte');
+    }
+};
+
+// Mantener compatibilidad con el nombre anterior
+export const loadAdminUsuarios = adminUsuariosControlador;

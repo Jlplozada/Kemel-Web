@@ -1,5 +1,6 @@
 import { navigate } from '../../router/router.js';
 import { clearAuth } from '../../helpers/auth.js';
+import { renderHeaderPorRol } from '../../helpers/gestionRoles.js';
 
 // Header simple para panadero - botón de Pedidos Pendientes y Cerrar Sesión
 export const headerPanadero = () => {
@@ -54,6 +55,8 @@ export const headerPanadero = () => {
         e.preventDefault();
         divMenu.classList.remove('activo');
         clearAuth();
+        // Re-renderizar el header para usuario no autenticado
+        renderHeaderPorRol(null, false);
         navigate('login');
     });
 

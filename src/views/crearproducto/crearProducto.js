@@ -1,10 +1,84 @@
 import { API_URL } from '../../helpers/api.js';
+import { getData } from '../../helpers/auth.js';
 import { alertaExito, alertaError, alertaConfirmacion, alertaLoading, cerrarAlerta, toast } from '../../helpers/alertas.js';
 
 class CrearProductoControlador {
     constructor() {
+        this.editMode = false;
+        this.productId = null;
+        this.checkEditMode();
         this.initializeForm();
         this.setupEventListeners();
+        
+        if (this.editMode) {
+            this.loadProductData();
+        }
+    }
+
+    checkEditMode() {
+        // Verificar si viene con ID en la URL para editar
+        const hash = window.location.hash;
+        const urlParams = new URLSearchParams(hash.split('?')[1]);
+        const id = urlParams.get('id');
+        
+        if (id) {
+            this.editMode = true;
+            this.productId = id;
+            this.updateUIForEdit();
+        }
+    }
+
+    updateUIForEdit() {
+        const titulo = document.getElementById('titulo-form');
+        const subtitulo = document.getElementById('subtitulo-form');
+        const btnCrear = document.getElementById('btn-crear');
+        
+        if (titulo) titulo.textContent = 'Editar Producto';
+        if (subtitulo) subtitulo.textContent = 'Modifica la información del producto';
+        if (btnCrear) btnCrear.textContent = 'Actualizar Producto';
+    }
+
+    async loadProductData() {
+        try {
+            alertaLoading('Cargando', 'Obteniendo datos del producto...');
+            
+            const { token } = getData();
+            const response = await fetch(`${API_URL}/productos/${this.productId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('No se pudo cargar el producto');
+            }
+
+            const resultado = await response.json();
+            cerrarAlerta();
+
+            if (resultado.success) {
+                this.fillForm(resultado.data);
+            } else {
+                throw new Error(resultado.error || 'Error al cargar el producto');
+            }
+        } catch (error) {
+            cerrarAlerta();
+            console.error('Error al cargar producto:', error);
+            await alertaError('Error', error.message || 'No se pudo cargar el producto');
+            window.location.hash = 'administrar-productos';
+        }
+    }
+
+    fillForm(producto) {
+        document.getElementById('nombre').value = producto.nombre || '';
+        document.getElementById('descripcion').value = producto.descripcion || '';
+        document.getElementById('precio').value = producto.precio || '';
+        
+        // Si tiene imagen, mostrarla
+        if (producto.imagen) {
+            this.showImagePreview(`${API_URL}${producto.imagen}`);
+        }
     }
 
     initializeForm() {
@@ -13,7 +87,6 @@ class CrearProductoControlador {
         this.previewContainer = document.getElementById('preview-container');
         this.imagePreview = document.getElementById('image-preview');
         this.removeImageBtn = document.getElementById('remove-image');
-        this.mensajeResultado = document.getElementById('mensaje-resultado');
         this.btnCrear = document.getElementById('btn-crear');
         this.btnCancelar = document.getElementById('btn-cancelar');
     }
@@ -27,17 +100,9 @@ class CrearProductoControlador {
         
         // Eventos para la imagen
         this.imagenInput.addEventListener('change', (e) => this.handleImageChange(e));
-        this.removeImageBtn.addEventListener('click', () => this.removeImage());
-        
-        // Validación en tiempo real del precio
-        document.getElementById('precio').addEventListener('input', (e) => {
-            this.validatePrice(e.target);
-        });
-        
-        // Validación en tiempo real del nombre
-        document.getElementById('nombre').addEventListener('input', (e) => {
-            this.validateName(e.target);
-        });
+        if (this.removeImageBtn) {
+            this.removeImageBtn.addEventListener('click', () => this.removeImage());
+        }
     }
 
     handleImageChange(event) {
@@ -50,52 +115,90 @@ class CrearProductoControlador {
 
         // Validar tipo de archivo
         if (!file.type.startsWith('image/')) {
-            this.showMessage('Por favor, selecciona un archivo de imagen válido.', 'error');
-            this.imagenInput.value = '';
+            alertaError('Archivo no válido', 'Por favor selecciona una imagen válida');
             return;
         }
 
         // Validar tamaño (5MB máximo)
         if (file.size > 5 * 1024 * 1024) {
-            this.showMessage('La imagen debe ser menor a 5MB.', 'error');
-            this.imagenInput.value = '';
+            alertaError('Archivo muy grande', 'La imagen no debe superar los 5MB');
             return;
         }
 
-        // Mostrar vista previa
+        // Mostrar preview
         const reader = new FileReader();
         reader.onload = (e) => {
-            this.imagePreview.src = e.target.result;
-            this.previewContainer.style.display = 'block';
+            this.showImagePreview(e.target.result);
         };
         reader.readAsDataURL(file);
     }
 
-    removeImage() {
-        this.imagenInput.value = '';
-        this.previewContainer.style.display = 'none';
-        this.imagePreview.src = '';
-    }
-
-    validatePrice(input) {
-        const value = parseFloat(input.value);
-        
-        if (isNaN(value) || value < 0) {
-            input.setCustomValidity('El precio debe ser un número positivo');
-        } else {
-            input.setCustomValidity('');
+    showImagePreview(src) {
+        if (this.imagePreview) {
+            this.imagePreview.src = src;
+        }
+        if (this.previewContainer) {
+            this.previewContainer.style.display = 'block';
         }
     }
 
-    validateName(input) {
-        const value = input.value.trim();
+    removeImage() {
+        if (this.imagenInput) {
+            this.imagenInput.value = '';
+        }
+        if (this.previewContainer) {
+            this.previewContainer.style.display = 'none';
+        }
+        if (this.imagePreview) {
+            this.imagePreview.src = '';
+        }
+    }
+
+    async handleSubmit(event) {
+        event.preventDefault();
         
-        if (value.length < 2) {
-            input.setCustomValidity('El nombre debe tener al menos 2 caracteres');
-        } else if (value.length > 100) {
-            input.setCustomValidity('El nombre no puede exceder 100 caracteres');
-        } else {
-            input.setCustomValidity('');
+        if (!this.form.checkValidity()) {
+            this.form.reportValidity();
+            return;
+        }
+
+        const action = this.editMode ? 'Actualizando' : 'Creando';
+        alertaLoading(`${action} Producto`, `Por favor espera mientras se ${action.toLowerCase()} el producto...`);
+
+        try {
+            const formData = new FormData(this.form);
+            
+            const productData = {
+                nombre: formData.get('nombre').trim(),
+                descripcion: formData.get('descripcion').trim(),
+                precio: parseFloat(formData.get('precio'))
+            };
+
+            // Manejar imagen si se seleccionó una nueva
+            const imagenFile = formData.get('imagen');
+            if (imagenFile && imagenFile.size > 0) {
+                productData.imagen = await this.uploadImage(imagenFile);
+            }
+
+            let result;
+            if (this.editMode) {
+                result = await this.updateProduct(productData);
+            } else {
+                result = await this.createProduct(productData);
+            }
+            
+            cerrarAlerta();
+            const successMessage = this.editMode ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente';
+            await alertaExito('¡Éxito!', successMessage);
+            
+            // Redirigir a administrar productos
+            window.location.hash = 'administrar-productos';
+
+        } catch (error) {
+            console.error('Error:', error);
+            cerrarAlerta();
+            const errorMessage = this.editMode ? 'No se pudo actualizar el producto' : 'No se pudo crear el producto';
+            await alertaError('Error', error.message || errorMessage);
         }
     }
 
@@ -104,8 +207,12 @@ class CrearProductoControlador {
         formData.append('imagen', file);
 
         try {
+            const { token } = getData();
             const response = await fetch(`${API_URL}/productos/upload`, {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
                 body: formData
             });
 
@@ -114,7 +221,7 @@ class CrearProductoControlador {
             }
 
             const result = await response.json();
-            return result.ruta;
+            return result.ruta || result.filename;
         } catch (error) {
             console.error('Error al subir imagen:', error);
             throw new Error('No se pudo subir la imagen');
@@ -123,9 +230,11 @@ class CrearProductoControlador {
 
     async createProduct(productData) {
         try {
+            const { token } = getData();
             const response = await fetch(`${API_URL}/productos`, {
                 method: 'POST',
                 headers: {
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(productData)
@@ -142,133 +251,45 @@ class CrearProductoControlador {
         }
     }
 
-    async handleSubmit(event) {
-        event.preventDefault();
-        
-        // Validar formulario
-        if (!this.form.checkValidity()) {
-            this.form.reportValidity();
-            return;
-        }
-
-        // Mostrar loading
-        alertaLoading('Creando Producto', 'Por favor espera mientras se crea el producto...');
-
+    async updateProduct(productData) {
         try {
-            const formData = new FormData(this.form);
-            
-            // Preparar datos del producto
-            const productData = {
-                nombre: formData.get('nombre').trim(),
-                descripcion: formData.get('descripcion').trim(),
-                precio: parseFloat(formData.get('precio')),
-                estado: formData.get('estado'),
-                imagen: null
-            };
+            const { token } = getData();
+            const response = await fetch(`${API_URL}/productos/${this.productId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(productData)
+            });
 
-            // Subir imagen si existe
-            const imagenFile = formData.get('imagen');
-            if (imagenFile && imagenFile.size > 0) {
-                productData.imagen = await this.uploadImage(imagenFile);
+            if (!response.ok) {
+                throw new Error('Error al actualizar el producto');
             }
 
-            // Crear producto
-            const result = await this.createProduct(productData);
-            
-            // Cerrar loading y mostrar éxito
-            cerrarAlerta();
-            await alertaExito('¡Producto Creado!', 'El producto se ha creado exitosamente');
-            
-            this.resetForm();
-            window.location.hash = '#/productos';
-
+            return await response.json();
         } catch (error) {
-            console.error('Error:', error);
-            // Cerrar loading y mostrar error
-            cerrarAlerta();
-            await alertaError('Error al Crear Producto', error.message || 'No se pudo crear el producto');
+            console.error('Error al actualizar producto:', error);
+            throw new Error('No se pudo actualizar el producto');
         }
     }
 
     async handleCancel() {
-        if (this.hasChanges()) {
-            const resultado = await alertaConfirmacion(
-                '¿Cancelar creación?',
-                '¿Estás seguro de que quieres cancelar? Se perderán todos los cambios.',
-                'Sí, cancelar',
-                'Continuar editando'
-            );
-            
-            if (resultado.isConfirmed) {
-                window.location.hash = '#/productos';
-            }
-        } else {
-            window.location.hash = '#/productos';
-        }
-    }
-
-    hasChanges() {
-        const formData = new FormData(this.form);
-        const nombre = formData.get('nombre').trim();
-        const descripcion = formData.get('descripcion').trim();
-        const precio = formData.get('precio');
-        const imagen = formData.get('imagen');
-
-        return nombre || descripcion || precio || (imagen && imagen.size > 0);
-    }
-
-    setLoading(loading) {
-        const spinner = this.btnCrear.querySelector('.loading-spinner');
-        const text = this.btnCrear.querySelector('span:not(.loading-spinner)') || this.btnCrear;
+        const action = this.editMode ? 'edición' : 'creación';
+        const resultado = await alertaConfirmacion(
+            `¿Cancelar ${action}?`,
+            `¿Estás seguro de que quieres cancelar? Se perderán todos los cambios.`,
+            'Sí, cancelar',
+            'Continuar editando'
+        );
         
-        if (loading) {
-            spinner.style.display = 'inline-block';
-            text.textContent = 'Creando...';
-            this.btnCrear.disabled = true;
-        } else {
-            spinner.style.display = 'none';
-            text.textContent = 'Crear Producto';
-            this.btnCrear.disabled = false;
+        if (resultado.isConfirmed) {
+            window.location.hash = 'administrar-productos';
         }
-    }
-
-    showMessage(message, type) {
-        this.mensajeResultado.textContent = message;
-        this.mensajeResultado.className = `mensaje ${type}`;
-        this.mensajeResultado.style.display = 'block';
-        
-        // Scroll hacia el mensaje
-        this.mensajeResultado.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
-        });
-    }
-
-    hideMessage() {
-        this.mensajeResultado.style.display = 'none';
-    }
-
-    resetForm() {
-        this.form.reset();
-        this.removeImage();
-        this.hideMessage();
     }
 }
 
 // Función para cargar el controlador
 export function loadCrearProducto() {
     new CrearProductoControlador();
-}
-
-// Auto-inicializar si se carga directamente
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        if (document.getElementById('form-crear-producto')) {
-            loadCrearProducto();
-        }
-    });
-} else {
-    if (document.getElementById('form-crear-producto')) {
-        loadCrearProducto();
-    }
 }

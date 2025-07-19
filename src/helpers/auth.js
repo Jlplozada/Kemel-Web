@@ -41,8 +41,14 @@ export const Autenticado = () => {
 
 // Función para limpiar los datos de autenticación (logout)
 export const clearAuth = () => {
+    console.log('Limpiando autenticación...');
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
+    
+    // Limpiar también cualquier dato adicional que pudiera existir
+    localStorage.removeItem('refreshToken');
+    
+    console.log('Tokens eliminados del localStorage');
 }
 
 // Función para obtener información del usuario guardada
