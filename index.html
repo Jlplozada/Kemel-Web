@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script type="module" src="/src/app.js"></script>
     <title>KemelOnline</title>
+    <script>
+      // Redirección inmediata a inicio si no hay hash
+      if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#/') {
+        window.location.hash = '#inicio';
+      }
+    </script>
   </head>
   <body>
     <div id="header"></div>

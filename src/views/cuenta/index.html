@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta</title>
+</head>
+<body>
+    <div id="cuenta-container">
+        <div class="cuenta-form">
+            <h2>Mi Cuenta</h2>
+            <p class="cuenta-descripcion">Actualiza tu información personal</p>
+            
+            <form id="cuenta-form">
+                <div class="input-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" name="direccion" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="ciudad">Ciudad</label>
+                    <select id="ciudad" name="ciudad" required>
+                        <option value="">Selecciona una ciudad</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Nueva contraseña (opcional)</label>
+                    <input type="password" id="password" name="password" placeholder="Dejar vacío para mantener la actual">
+                </div>
+
+                <div class="input-group">
+                    <label for="confirmar-password">Confirmar nueva contraseña</label>
+                    <input type="password" id="confirmar-password" name="confirmar-password" placeholder="Solo si cambiaste la contraseña">
+                </div>
+
+                <button type="submit" class="btn-actualizar">Actualizar Datos</button>
+            </form>
+
+            <div class="cuenta-acciones">
+                <button id="btn-volver" class="btn-secundario">Volver al Inicio</button>
+                <button id="btn-cerrar-sesion" class="btn-cerrar-sesion">Cerrar Sesión</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

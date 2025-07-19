@@ -1,8 +1,7 @@
 import { navigate } from '../../router/router.js';
-import { alertaConfirmacion } from '../../helpers/alertas.js';
 import { clearAuth } from '../../helpers/auth.js';
 
-// Header para el panel de panadero, solo muestra la opción Cerrar Sesión
+// Header simple para panadero - botón de Pedidos Pendientes y Cerrar Sesión
 export const headerPanadero = () => {
     const barraNavegacion = document.createElement('nav');
     const divLogo = document.createElement('div');
@@ -12,21 +11,26 @@ export const headerPanadero = () => {
     const menuBtn = document.createElement('button');
     const menuIcon = document.createElement('img');
 
-    // Botón de cerrar sesión único
+    // Botones de navegación para panadero
+    const pedidosPendientes = document.createElement('a');
     const cerrarSesion = document.createElement('a');
 
     logo.src = '../public/kemel.png';
     logo.alt = 'Logo Kemel';
 
-    logoApi.href = '#panadero';
+    logoApi.href = '#inicio';
     logoApi.appendChild(logo);
 
+    pedidosPendientes.textContent = 'Pedidos Pendientes';
     cerrarSesion.textContent = 'Cerrar Sesión';
+
+    pedidosPendientes.setAttribute('href', '#pedidos-pendientes');
     cerrarSesion.setAttribute('href', '#logout');
 
     divMenu.classList.add('nav-menu');
     divLogo.classList.add('nav-logo');
 
+    divMenu.appendChild(pedidosPendientes);
     divMenu.appendChild(cerrarSesion);
     divLogo.appendChild(logoApi);
 
@@ -39,25 +43,18 @@ export const headerPanadero = () => {
         divMenu.classList.toggle('activo');
     });
 
-    // Interceptar el click para cerrar sesión
-    cerrarSesion.addEventListener('click', async (e) => {
+    // Event listeners para navegación
+    pedidosPendientes.addEventListener('click', (e) => {
         e.preventDefault();
         divMenu.classList.remove('activo');
-        
-        // Confirmar antes de cerrar sesión
-        const resultado = await alertaConfirmacion(
-            '¿Cerrar Sesión?',
-            '¿Estás seguro de que quieres cerrar sesión?',
-            'Sí, cerrar sesión',
-            'Cancelar'
-        );
-        
-        if (resultado.isConfirmed) {
-            // Limpiar datos de autenticación
-            clearAuth();
-            // Redirigir al login
-            navigate('login');
-        }
+        navigate('pedidos-pendientes');
+    });
+
+    cerrarSesion.addEventListener('click', (e) => {
+        e.preventDefault();
+        divMenu.classList.remove('activo');
+        clearAuth();
+        navigate('login');
     });
 
     barraNavegacion.appendChild(divLogo);

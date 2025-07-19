@@ -7,7 +7,7 @@ export const inicioControlador = async () => {
     // La página de inicio es pública - no necesita protección
     // Solo cargar el header correcto si el usuario está autenticado
     if (Autenticado()) {
-        await cargarHeaderSegunRol();
+        cargarHeaderSegunRol();
     }
 
     // Limpiar solo el contenedor principal de la app

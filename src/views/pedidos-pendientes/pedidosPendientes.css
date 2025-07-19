@@ -1,0 +1,128 @@
+.pedidos-pendientes-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.pedidos-pendientes-container h2 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.pedidos-pendientes-container p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.tabla-container {
+    overflow-x: auto;
+}
+
+.tabla-pedidos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.tabla-pedidos th,
+.tabla-pedidos td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabla-pedidos th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.tabla-pedidos tr:hover {
+    background-color: #f5f5f5;
+}
+
+.btn-accion {
+    padding: 6px 12px;
+    margin: 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.3s;
+}
+
+.btn-aprobar {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-aprobar:hover {
+    background-color: #218838;
+}
+
+.btn-preparar {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-preparar:hover {
+    background-color: #e0a800;
+}
+
+.btn-entregar {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-entregar:hover {
+    background-color: #0056b3;
+}
+
+.estado-pendiente {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.estado-aprobado {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.estado-preparado {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.mensaje-vacio {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.productos-lista {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .pedidos-pendientes-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .tabla-pedidos {
+        font-size: 0.875rem;
+    }
+    
+    .tabla-pedidos th,
+    .tabla-pedidos td {
+        padding: 8px;
+    }
+}

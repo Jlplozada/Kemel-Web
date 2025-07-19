@@ -1,4 +1,5 @@
 import { navigate } from '../../router/router.js';
+import { Autenticado } from '../../helpers/auth.js';
 
 export const header = () => {
     // Usar <nav> para la barra de navegación para mejor semántica y compatibilidad CSS
@@ -22,11 +23,23 @@ export const header = () => {
 
     inicio.textContent = 'Inicio';
     catalogo.textContent = 'Catálogo';
-    cuenta.textContent = 'Cuenta';
+    
+    // Función para actualizar el texto y enlace del botón cuenta
+    const actualizarBotonCuenta = () => {
+        if (Autenticado()) {
+            cuenta.textContent = 'Mi Cuenta';
+            cuenta.setAttribute("href", '#cuenta');
+        } else {
+            cuenta.textContent = 'Iniciar Sesión';
+            cuenta.setAttribute("href", '#login');
+        }
+    };
+
+    // Actualizar inicialmente
+    actualizarBotonCuenta();
 
     inicio.setAttribute("href", '#inicio');
     catalogo.setAttribute("href", '#catalogo');
-    cuenta.setAttribute("href", '#login');
 
     divMenu.classList.add('nav-menu');
     divLogo.classList.add('nav-logo');
@@ -55,6 +68,16 @@ export const header = () => {
         // Usar navigate del router
         navigate(ruta);
       });
+    });
+
+    // Escuchar cambios en el estado de autenticación para actualizar el botón cuenta
+    window.addEventListener('hashchange', () => {
+        actualizarBotonCuenta();
+    });
+
+    // También escuchar eventos de storage para cambios en localStorage
+    window.addEventListener('storage', () => {
+        actualizarBotonCuenta();
     });
 
     barraNavegacion.appendChild(divLogo);

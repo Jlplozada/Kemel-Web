@@ -52,7 +52,7 @@ export function validarControlador() {
                 await toast(`¡Bienvenido ${resultado.data.usuario.nombre}! Entrando como ${rolUsuario}...`, 'success');
                 
                 // Cargar el header correcto según el rol
-                await cargarHeaderSegunRol();
+                cargarHeaderSegunRol();
                 
                 // Pequeña pausa para que el usuario vea el mensaje
                 setTimeout(() => {

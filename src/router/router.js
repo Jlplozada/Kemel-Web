@@ -7,6 +7,10 @@ import { validarControlador } from "../views/login/validar/validarControlador.js
 import { loadCrearProducto } from "../views/crearproducto/crearProducto.js";
 import { loadAdministrarProductos } from "../views/administrar-productos/administrarProductosControlador.js";
 import { loadUsuarios } from "../views/usuarios/usuariosControlador.js";
+import { cuentaControlador } from "../views/cuenta/cuentaControlador.js";
+import { pedidosPendientesControlador } from "../views/pedidos-pendientes/pedidosPendientesControlador.js";
+import { adminPedidosControlador } from "../views/admin-pedidos/adminPedidosControlador.js";
+import { adminUsuariosControlador } from "../views/admin-usuarios/adminUsuariosControlador.js";
 
 const routes = {
     login: {
@@ -15,9 +19,9 @@ const routes = {
         private: false,
     },
     cuenta: {
-        template: "login/validar/index.html",
-        controlador: validarControlador,
-        private: false,
+        template: "cuenta/index.html",
+        controlador: cuentaControlador,
+        private: true,
     },
     "": {
         template: "inicio/index.html",
@@ -74,6 +78,21 @@ const routes = {
         controlador: loadUsuarios,
         private: true,
     },
+    "pedidos-pendientes": {
+        template: "pedidos-pendientes/index.html",
+        controlador: pedidosPendientesControlador,
+        private: true,
+    },
+    "admin-pedidos": {
+        template: "admin-pedidos/index.html",
+        controlador: adminPedidosControlador,
+        private: true,
+    },
+    "admin-usuarios": {
+        template: "admin-usuarios/index.html",
+        controlador: adminUsuariosControlador,
+        private: true,
+    },
     "crear-producto": {
         template: "crearproducto/index.html",
         controlador: loadCrearProducto,
@@ -88,8 +107,11 @@ export const router = async (app) => {
     // Usar hash para SPA
     let hash = location.hash.replace('#', '') || ''; // Quita el # inicial
     
-    // Si no hay hash, establecer 'inicio' como hash por defecto
-    if (hash === '' || hash === '/') {
+    console.log('Router ejecutándose con hash:', hash);
+    
+    // Si no hay hash o está vacío, establecer 'inicio' como hash por defecto
+    if (hash === '' || hash === '/' || hash === null || hash === undefined) {
+        console.log('Hash vacío, redirigiendo a inicio');
         hash = 'inicio';
         // Establecer el hash sin disparar hashchange
         history.replaceState(null, '', '#inicio');
@@ -97,7 +119,11 @@ export const router = async (app) => {
     
     const [rutas, params] = matchRoute(hash); // Busca la ruta y extrae parámetros
 
+    console.log('Ruta encontrada:', rutas);
+    console.log('Parámetros:', params);
+
     if (!rutas) {
+        console.log('No se encontró ruta, cargando inicio por defecto');
         // Si la ruta no existe, redirige a inicio
         await loadView(app, "inicio/index.html");
         if (inicioControlador) inicioControlador();
@@ -106,10 +132,14 @@ export const router = async (app) => {
 
     // Si la ruta es privada y el usuario no está autenticado, redirige a login
     if (rutas.private && !Autenticado()) {
+        console.log('Ruta privada sin autenticación, redirigiendo a login');
         await loadView(app, "login/validar/index.html");
         if (validarControlador) validarControlador();
         return;
     }
+
+    console.log('Cargando vista:', rutas.template);
+    console.log('Controlador a ejecutar:', rutas.controlador?.name || 'Sin controlador');
 
     // Carga la vista correspondiente
     await loadView(app, rutas.template);

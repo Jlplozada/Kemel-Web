@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Admin</title>
+</head>
+<body>
+    <div class="admin-usuarios-container">
+        <h2>Gestión de Usuarios</h2>
+        <p>Administración completa de todos los usuarios activos</p>
+        
+        <div class="filtros-container">
+            <select id="filtro-rol" class="filtro-select">
+                <option value="">Todos los roles</option>
+                <option value="admin">Administradores</option>
+                <option value="panaderia">Panaderos</option>
+                <option value="cliente">Clientes</option>
+            </select>
+            <button id="btn-crear-usuario" class="btn-crear">Crear Usuario</button>
+        </div>
+        
+        <div class="tabla-container">
+            <table class="tabla-usuarios">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Rol</th>
+                        <th>Fecha Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-admin-usuarios">
+                    <!-- Los usuarios se cargarán aquí dinámicamente -->
+                </tbody>
+            </table>
+            
+            <div id="mensaje-sin-usuarios" class="mensaje-vacio" style="display: none;">
+                <p>No hay usuarios que mostrar</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

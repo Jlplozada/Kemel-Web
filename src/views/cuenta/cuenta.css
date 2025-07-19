@@ -1,0 +1,131 @@
+#cuenta-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+.cuenta-form {
+    background: white;
+    border: 2px solid #333;
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.cuenta-form h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 24px;
+}
+
+.cuenta-descripcion {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: #333;
+}
+
+.btn-actualizar {
+    width: 100%;
+    background: #333;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.btn-actualizar:hover {
+    background: #555;
+}
+
+.cuenta-acciones {
+    text-align: center;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-secundario {
+    background: transparent;
+    color: #333;
+    border: 2px solid #333;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-secundario:hover {
+    background: #333;
+    color: white;
+}
+
+.btn-cerrar-sesion {
+    background: #dc3545;
+    color: white;
+    border: 2px solid #dc3545;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-cerrar-sesion:hover {
+    background: #c82333;
+    border-color: #c82333;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .cuenta-form {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .cuenta-form h2 {
+        font-size: 20px;
+    }
+    
+    .cuenta-acciones {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-secundario,
+    .btn-cerrar-sesion {
+        width: 100%;
+        padding: 12px;
+    }
+}

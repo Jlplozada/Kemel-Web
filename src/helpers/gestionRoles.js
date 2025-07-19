@@ -1,59 +1,52 @@
 import { esAdministrador, esPanadero, getUsuario } from './auth.js';
+import { header } from '../components/header/header.js';
+import { headerAdministrador } from '../components/header/headerAdministrador.js';
+import { headerPanadero } from '../components/header/headerPanadero.js';
 
 /**
  * Función para cargar el header correcto según el rol del usuario
  * Se ejecuta después del login exitoso o al verificar autenticación
  */
-export const cargarHeaderSegunRol = async () => {
+export const cargarHeaderSegunRol = () => {
     console.log("Cargando header según rol del usuario...");
     
     const usuario = getUsuario();
     if (!usuario) {
-        console.log("No hay usuario logueado, no se carga header");
+        console.log("No hay usuario logueado, cargando header por defecto");
+        renderHeaderPorRol(null, false);
         return;
     }
 
     console.log(`Usuario: ${usuario.nombre}, Rol: ${usuario.rol}`);
+    
+    // Usar la función de renderizado centralizada
+    renderHeaderPorRol(usuario.rol, true);
+}
 
-    // Determinar qué header cargar según el rol
-    let headerControlador = null;
-    let nombreHeader = '';
-
-    if (esAdministrador()) {
-        // Cargar header de administrador
-        try {
-            const { headerAdministradorControlador } = await import('../components/header/headerAdministrador.js');
-            headerControlador = headerAdministradorControlador;
-            nombreHeader = 'Administrador';
-        } catch (error) {
-            console.error('Error al cargar header de administrador:', error);
-        }
-    } else if (esPanadero()) {
-        // Cargar header de panadero
-        try {
-            const { headerPanaderoControlador } = await import('../components/header/headerPanadero.js');
-            headerControlador = headerPanaderoControlador;
-            nombreHeader = 'Panadero';
-        } catch (error) {
-            console.error('Error al cargar header de panadero:', error);
-        }
-    } else {
-        // Cargar header normal para usuarios
-        try {
-            const { headerControlador: headerNormal } = await import('../components/header/header.js');
-            headerControlador = headerNormal;
-            nombreHeader = 'Usuario';
-        } catch (error) {
-            console.error('Error al cargar header normal:', error);
-        }
+/**
+ * Función centralizada para renderizar headers según el rol
+ */
+export const renderHeaderPorRol = (rol, autenticado = false) => {
+    const headerContainer = document.querySelector('#header');
+    if (!headerContainer) {
+        console.error('No se encontró el contenedor #header');
+        return;
     }
-
-    // Ejecutar el controlador del header si se cargó correctamente
-    if (headerControlador) {
-        console.log(`Cargando header de ${nombreHeader}...`);
-        headerControlador();
+    
+    headerContainer.innerHTML = "";
+    
+    console.log('Renderizando header para rol:', rol, 'autenticado:', autenticado);
+    
+    if (rol === 'admin') {
+        headerContainer.appendChild(headerAdministrador());
+        console.log('Header de administrador renderizado');
+    } else if (rol === 'panaderia') {
+        headerContainer.appendChild(headerPanadero());
+        console.log('Header de panadero renderizado');
     } else {
-        console.error('No se pudo cargar ningún header');
+        // Header de cliente (normal)
+        headerContainer.appendChild(header());
+        console.log('Header normal renderizado');
     }
 }
 

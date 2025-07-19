@@ -1,7 +1,8 @@
 import { navigate } from '../../router/router.js';
 import { clearAuth } from '../../helpers/auth.js';
 
-const headerAdministrador = () => {
+// Header completo para administrador - múltiples opciones de gestión
+export const headerAdministrador = () => {
     const barraNavegacion = document.createElement('nav');
     const divLogo = document.createElement('div');
     const logo = document.createElement('img');
@@ -93,5 +94,3 @@ const headerAdministrador = () => {
     barraNavegacion.classList.add('header');
     return barraNavegacion;
 };
-
-export { headerAdministrador };

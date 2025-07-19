@@ -431,10 +431,10 @@ export const loadUsuarios = () => {
     return new UsuariosControlador();
 };
 
-// Ejecutar cuando se cargue la vista
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Usuarios controlador ejecutado');
-    new UsuariosControlador();
-});
+// NO ejecutar automáticamente - solo cuando se llame explícitamente desde el router
+// document.addEventListener('DOMContentLoaded', () => {
+//     console.log('Usuarios controlador ejecutado');
+//     new UsuariosControlador();
+// });
 
 export default UsuariosControlador;

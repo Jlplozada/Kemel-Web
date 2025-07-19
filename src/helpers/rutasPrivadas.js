@@ -108,7 +108,7 @@ export const protegerVista = async (nombreVista = "esta vista", rolRequerido = n
     }
 
     // Cargar el header correcto según el rol después de verificar acceso
-    await cargarHeaderSegunRol();
+    cargarHeaderSegunRol();
     
     console.log(`Acceso permitido a ${nombreVista}`);
     return true;

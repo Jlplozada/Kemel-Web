@@ -1,9 +1,7 @@
 import "./style.css";
 import { Autenticado, getData } from "./helpers/auth.js";
 import { API_URL } from "./helpers/api.js";
-import { header } from "./components/header/header.js";
-import { headerAdministrador } from "./components/header/headerAdministrador.js";
-import { headerPanadero } from "./components/header/headerPanadero.js";
+import { renderHeaderPorRol } from "./helpers/gestionRoles.js";
 import { router } from "./router/router.js";
 import { footer } from "./components/footer/footer.js";
 // Importa aquí otros componentes o helpers si los necesitas
@@ -18,23 +16,6 @@ const app = document.querySelector('#app');
 const headerContainer = document.querySelector('#header');
 let headerRendered = false;
 
-// Renderiza el header según el rol y el estado de autenticación
-function renderHeaderPorRol(rol, autenticado = false) {
-  if (!headerContainer) return;
-  headerContainer.innerHTML = "";
-  if (rol === 'admin') {
-    headerContainer.appendChild(headerAdministrador());
-    headerRendered = true;
-  } else if (rol === 'panaderia') {
-    headerContainer.appendChild(headerPanadero());
-    headerRendered = true;
-  } else {
-    // El header de cliente puede recibir si está autenticado o no
-    headerContainer.appendChild(header({ autenticado }));
-    headerRendered = true;
-  }
-}
-
 // Ejemplo de manejo de botones según autenticación
 const subir_crear = document.querySelector('.subir_crear');
 const subir_capitulo = document.querySelector('.subir_capitulo');
@@ -47,31 +28,52 @@ if (subir_crear && !Autenticado()) {
 let perfilData = null;
 if (token) {
   try {
-    const responsePerfil = await fetch(`${API_URL}/api/usuarios/perfil`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-    const { data } = await responsePerfil.json();
-    perfilData = data;
-    // Renderizar header según el rol y autenticación
-    renderHeaderPorRol(perfilData.rol, true);
+    // Primero intentar obtener datos del localStorage
+    const usuarioGuardado = localStorage.getItem('usuario');
+    if (usuarioGuardado) {
+      perfilData = JSON.parse(usuarioGuardado);
+      console.log('Datos de usuario desde localStorage:', perfilData);
+      renderHeaderPorRol(perfilData.rol, true);
+    } else {
+      // Si no hay datos en localStorage, hacer petición a la API
+      console.log('No hay usuario en localStorage, limpiando token');
+      localStorage.removeItem('token');
+      renderHeaderPorRol(undefined, false);
+    }
   } catch (e) {
-    console.error('No se pudo obtener el perfil:', e);
-    // Si hay error, renderizar header por defecto (no autenticado)
+    console.error('Error al procesar datos del usuario:', e);
+    // Si hay error, limpiar tokens
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
     renderHeaderPorRol(undefined, false);
   }
 } else {
   // Si no hay token, renderizar header por defecto (no autenticado)
+  console.log('No hay token, renderizando header no autenticado');
   renderHeaderPorRol(undefined, false);
 }
 
-// Manejo de navegación SPA - ya está configurado en router.js
-// Solo necesitamos inicializar cuando carga la página
+// Manejo de navegación SPA
 document.addEventListener("DOMContentLoaded", () => {
+    // Verificar si la URL está vacía y redirigir a inicio
+    if (window.location.hash === '' || window.location.hash === '#' || window.location.hash === '#/') {
+        console.log('URL vacía detectada, redirigiendo a inicio');
+        window.location.hash = '#inicio';
+    }
+    
+    // Inicializar el router
     router(app);
+    
     // Renderizar footer solo una vez
     if (!document.querySelector('footer.footer')) {
         document.body.appendChild(footer());
+    }
+});
+
+// También verificar cuando la página se carga completamente
+window.addEventListener('load', () => {
+    if (window.location.hash === '' || window.location.hash === '#' || window.location.hash === '#/') {
+        console.log('URL vacía en load, redirigiendo a inicio');
+        window.location.hash = '#inicio';
     }
 });
