@@ -1,6 +1,7 @@
 import { API_URL } from '../../helpers/api.js';
 import { getData } from '../../helpers/auth.js';
 import { alertaError, alertaExito, alertaLoading, cerrarAlerta } from '../../helpers/alertas.js';
+import Swal from 'sweetalert2';
 
 export const administrarProductosControlador = async () => {
     console.log("Ejecutando administrarProductosControlador...");
@@ -147,19 +148,23 @@ window.editarProducto = async (productoId) => {
 // Función global para eliminar producto
 window.eliminarProducto = async (productoId) => {
     try {
-        // Mostrar confirmación
+        // Mostrar confirmación usando Swal directamente
         const confirmacion = await Swal.fire({
             title: '¿Estás seguro?',
-            text: 'El producto será marcado como eliminado',
+            text: 'El producto será marcado como eliminado y no aparecerá en el catálogo',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
         });
 
-        if (!confirmacion.isConfirmed) return;
+        // Verificar si el usuario confirmó la eliminación
+        if (!confirmacion.isConfirmed) {
+            return;
+        }
 
         alertaLoading('Eliminando', 'Marcando producto como eliminado...');
 

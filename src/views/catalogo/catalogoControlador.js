@@ -9,10 +9,46 @@ function crearCardCatalogo(producto) {
 
   // Imagen
   const img = document.createElement("img");
-  img.src = producto.imagen ? producto.imagen : "/img/default.png";
-  img.alt = producto.nombre;
-  img.className = "catalogo-img";
-  card.appendChild(img);
+  if (producto.imagen) {
+    img.src = `${API_URL}${producto.imagen}`;
+    img.onerror = function() {
+      this.style.display = 'none';
+      const placeholder = document.createElement('div');
+      placeholder.style.cssText = `
+        width: 100%;
+        height: 200px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 14px;
+      `;
+      placeholder.textContent = 'Sin imagen';
+      this.parentNode.insertBefore(placeholder, this.nextSibling);
+    };
+  } else {
+    // Si no hay imagen, crear placeholder
+    const placeholder = document.createElement('div');
+    placeholder.style.cssText = `
+      width: 100%;
+      height: 200px;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 14px;
+    `;
+    placeholder.textContent = 'Sin imagen';
+    card.appendChild(placeholder);
+  }
+  
+  if (producto.imagen) {
+    img.alt = producto.nombre;
+    img.className = "catalogo-img";
+    card.appendChild(img);
+  }
 
   // Título
   const titulo = document.createElement("h3");
@@ -65,15 +101,50 @@ function crearCardCatalogo(producto) {
 
 export const catalogoControlador = async function () {
   try {
+    console.log("=== CARGANDO CATÁLOGO ===");
     const res = await fetch(`${API_URL}/productos`);
+    
+    if (!res.ok) {
+      throw new Error(`Error HTTP: ${res.status}`);
+    }
+    
     const productos = await res.json();
+    console.log("Productos recibidos:", productos);
+    console.log("Cantidad de productos activos:", productos.length);
+    
     const contenedor = document.getElementById("catalogo-contenedor");
+    if (!contenedor) {
+      console.error("No se encontró el contenedor del catálogo");
+      return;
+    }
+    
     contenedor.innerHTML = "";
     
-    // Agregar productos
-    productos.forEach(producto => {
-      const card = crearCardCatalogo(producto);
-      contenedor.appendChild(card);
+    // Verificar que hay productos activos
+    if (productos.length === 0) {
+      console.log("No hay productos activos disponibles");
+      const mensajeVacio = document.createElement("div");
+      mensajeVacio.style.cssText = `
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-size: 18px;
+      `;
+      mensajeVacio.textContent = "No hay productos disponibles en este momento";
+      contenedor.appendChild(mensajeVacio);
+      return;
+    }
+    
+    // Agregar productos (solo los activos que vienen del servidor)
+    productos.forEach((producto, index) => {
+      console.log(`Procesando producto ${index + 1}:`, producto);
+      // Solo procesar productos que tienen estado activo (doble verificación)
+      if (producto.estado === 'activo' || !producto.estado) { // Si no tiene estado, asumimos que es activo
+        const card = crearCardCatalogo(producto);
+        contenedor.appendChild(card);
+      } else {
+        console.log(`Producto ${producto.nombre} omitido por estado: ${producto.estado}`);
+      }
     });
     
     // Agregar botón de crear pedido debajo de los productos
@@ -81,6 +152,7 @@ export const catalogoControlador = async function () {
     
   } catch (error) {
     console.error("Error al cargar catálogo:", error);
+    await alertaError("Error", "No se pudieron cargar los productos del catálogo");
   }
 }
 
