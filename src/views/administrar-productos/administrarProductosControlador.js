@@ -88,15 +88,18 @@ const crearFilaProductoAdmin = (producto, claseProducto) => {
     fila.innerHTML = `
         <td>${producto.id}</td>
         <td>
-            <img src="${API_URL}/img/${producto.imagen}" alt="${producto.nombre}" 
-                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
-                 onerror="this.src='${API_URL}/img/default.jpg'">
+            ${producto.imagen ? 
+                `<img src="${API_URL}${producto.imagen}" alt="${producto.nombre}" 
+                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                 <span style="display: none; font-size: 12px; color: #666;">Sin imagen</span>` :
+                `<span style="font-size: 12px; color: #666;">Sin imagen</span>`
+            }
         </td>
         <td>${producto.nombre}</td>
         <td>${producto.descripcion || 'Sin descripción'}</td>
         <td>$${precioFormateado}</td>
         <td>${crearBadgeEstado(producto.estado)}</td>
-        <td>${producto.stock || 0}</td>
         <td>
             <button class="btn-accion btn-editar" onclick="editarProducto(${producto.id})">
                 Editar
