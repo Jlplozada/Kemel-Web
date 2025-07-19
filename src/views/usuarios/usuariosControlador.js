@@ -1,6 +1,7 @@
 import { API_URL } from '../../helpers/api.js';
 import { getData } from '../../helpers/auth.js';
 import { navigate } from '../../router/router.js';
+import { alertaError, alertaExito, alertaConfirmacion, alertaLoading, cerrarAlerta, toast } from '../../helpers/alertas.js';
 
 class UsuariosControlador {
     constructor() {
@@ -244,56 +245,58 @@ class UsuariosControlador {
 
         // Botones de eliminar
         document.querySelectorAll('.btn-eliminar').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const id = e.target.getAttribute('data-id');
                 const nombre = e.target.getAttribute('data-nombre');
                 const correo = e.target.getAttribute('data-correo');
-                this.abrirModalEliminar(id, nombre, correo);
+                await this.confirmarEliminarUsuario(id, nombre, correo);
             });
         });
 
         // Botones de restaurar
         document.querySelectorAll('.btn-restaurar').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const id = e.target.getAttribute('data-id');
                 const nombre = e.target.getAttribute('data-nombre');
                 const correo = e.target.getAttribute('data-correo');
-                this.abrirModalRestaurar(id, nombre, correo);
+                await this.confirmarRestaurarUsuario(id, nombre, correo);
             });
         });
     }
 
-    abrirModalEliminar(id, nombre, correo) {
-        this.usuarioAEliminar = id;
-        if (this.usuarioNombreEliminar) this.usuarioNombreEliminar.textContent = nombre;
-        if (this.usuarioCorreoEliminar) this.usuarioCorreoEliminar.textContent = correo;
-        if (this.modalEliminar) this.modalEliminar.style.display = 'flex';
+    async confirmarEliminarUsuario(id, nombre, correo) {
+        const resultado = await alertaConfirmacion(
+            '¿Eliminar Usuario?',
+            `¿Estás seguro de que quieres eliminar a ${nombre} (${correo})?`,
+            'Sí, eliminar',
+            'Cancelar'
+        );
+
+        if (resultado.isConfirmed) {
+            await this.eliminarUsuario(id);
+        }
     }
 
-    cerrarModalEliminar() {
-        this.usuarioAEliminar = null;
-        if (this.modalEliminar) this.modalEliminar.style.display = 'none';
+    async confirmarRestaurarUsuario(id, nombre, correo) {
+        const resultado = await alertaConfirmacion(
+            '¿Restaurar Usuario?',
+            `¿Estás seguro de que quieres restaurar a ${nombre} (${correo})?`,
+            'Sí, restaurar',
+            'Cancelar'
+        );
+
+        if (resultado.isConfirmed) {
+            await this.restaurarUsuario(id);
+        }
     }
 
-    abrirModalRestaurar(id, nombre, correo) {
-        this.usuarioARestaurar = id;
-        if (this.usuarioNombreRestaurar) this.usuarioNombreRestaurar.textContent = nombre;
-        if (this.usuarioCorreoRestaurar) this.usuarioCorreoRestaurar.textContent = correo;
-        if (this.modalRestaurar) this.modalRestaurar.style.display = 'flex';
-    }
-
-    cerrarModalRestaurar() {
-        this.usuarioARestaurar = null;
-        if (this.modalRestaurar) this.modalRestaurar.style.display = 'none';
-    }
-
-    async eliminarUsuario() {
-        if (!this.usuarioAEliminar) return;
-
+    async eliminarUsuario(usuarioId) {
         try {
+            alertaLoading('Eliminando Usuario', 'Por favor espera...');
+            
             const { accessToken } = getData();
             
-            const response = await fetch(`${API_URL}/usuarios/${this.usuarioAEliminar}`, {
+            const response = await fetch(`${API_URL}/usuarios/${usuarioId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -305,23 +308,24 @@ class UsuariosControlador {
                 throw new Error('Error al eliminar usuario');
             }
 
-            this.mostrarMensaje('Usuario eliminado correctamente', 'exito');
-            this.cerrarModalEliminar();
+            cerrarAlerta();
+            await toast('Usuario eliminado correctamente', 'success');
             this.cargarUsuarios(); // Recargar la lista
             
         } catch (error) {
             console.error('Error eliminando usuario:', error);
-            this.mostrarMensaje('Error al eliminar el usuario', 'error');
+            cerrarAlerta();
+            await alertaError('Error', 'Error al eliminar el usuario');
         }
     }
 
-    async restaurarUsuario() {
-        if (!this.usuarioARestaurar) return;
-
+    async restaurarUsuario(usuarioId) {
         try {
+            alertaLoading('Restaurando Usuario', 'Por favor espera...');
+            
             const { accessToken } = getData();
             
-            const response = await fetch(`${API_URL}/usuarios/${this.usuarioARestaurar}/restaurar`, {
+            const response = await fetch(`${API_URL}/usuarios/${usuarioId}/restaurar`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -333,13 +337,14 @@ class UsuariosControlador {
                 throw new Error('Error al restaurar usuario');
             }
 
-            this.mostrarMensaje('Usuario restaurado correctamente', 'exito');
-            this.cerrarModalRestaurar();
+            cerrarAlerta();
+            await toast('Usuario restaurado correctamente', 'success');
             this.cargarUsuarios(); // Recargar la lista
             
         } catch (error) {
             console.error('Error restaurando usuario:', error);
-            this.mostrarMensaje('Error al restaurar el usuario', 'error');
+            cerrarAlerta();
+            await alertaError('Error', 'Error al restaurar el usuario');
         }
     }
 

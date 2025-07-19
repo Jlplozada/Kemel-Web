@@ -9,7 +9,7 @@ import { footer } from "./components/footer/footer.js";
 // Importa aquí otros componentes o helpers si los necesitas
 
 // Obtener datos del usuario autenticado
-const { accessToken } = getData();
+const { token } = getData();
 
 // Selecciona el contenedor principal de la app
 const app = document.querySelector('#app');
@@ -45,11 +45,11 @@ if (subir_crear && !Autenticado()) {
 
 // Obtener perfil del usuario autenticado (si hay token) y renderizar header según rol
 let perfilData = null;
-if (accessToken) {
+if (token) {
   try {
     const responsePerfil = await fetch(`${API_URL}/api/usuarios/perfil`, {
         headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${token}`
         }
     });
     const { data } = await responsePerfil.json();

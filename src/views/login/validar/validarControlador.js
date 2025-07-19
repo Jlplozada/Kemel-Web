@@ -1,6 +1,7 @@
 import { loginUsuario } from '../../../helpers/api.js';
 import { setData } from '../../../helpers/auth.js';
 import { cargarHeaderSegunRol, redirigirSegunRol } from '../../../helpers/gestionRoles.js';
+import { alertaError, alertaExito, alertaLoading, cerrarAlerta, toast } from '../../../helpers/alertas.js';
 
 // Controlador para la vista de validación/login
 export function validarControlador() {
@@ -23,18 +24,15 @@ export function validarControlador() {
         
         // Validar que los campos no estén vacíos
         if (!usuario || !clave) {
-            mostrarError('Por favor, completa todos los campos');
+            await alertaError('Campos Requeridos', 'Por favor, completa todos los campos');
             return;
         }
 
         // Mostrar estado de carga
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const textoOriginal = submitBtn.textContent;
-        submitBtn.textContent = 'Iniciando sesión...';
-        submitBtn.disabled = true;
+        alertaLoading('Iniciando Sesión', 'Verificando credenciales...');
 
         try {
-            // Intentar hacer login (el campo usuario debe ser el email)
+            // Intentar hacer login (el campo usuario debe ser el nombre de usuario)
             const resultado = await loginUsuario(usuario, clave);
             
             if (resultado.success) {
@@ -42,16 +40,16 @@ export function validarControlador() {
                 console.log("Login exitoso, guardando datos...");
                 console.log("Datos del usuario:", resultado.data.usuario);
                 
-                // Guardar tokens y datos del usuario usando la función simplificada
+                // Guardar token y datos del usuario usando la función simplificada
                 setData({
-                    accessToken: resultado.data.token,
-                    refreshToken: resultado.data.refreshToken,
+                    token: resultado.data.token, // Solo un token
                     usuario: resultado.data.usuario
                 });
                 
-                // Mostrar mensaje de éxito con el rol
+                // Cerrar loading y mostrar mensaje de éxito
+                cerrarAlerta();
                 const rolUsuario = resultado.data.usuario.rol || 'cliente';
-                mostrarExito(`¡Bienvenido ${resultado.data.usuario.nombre}! Entrando como ${rolUsuario}...`);
+                await toast(`¡Bienvenido ${resultado.data.usuario.nombre}! Entrando como ${rolUsuario}...`, 'success');
                 
                 // Cargar el header correcto según el rol
                 await cargarHeaderSegunRol();
@@ -64,15 +62,13 @@ export function validarControlador() {
                 
             } else {
                 // Error en el login - mostrar mensaje de error
-                mostrarError(resultado.error || 'Error al iniciar sesión');
+                cerrarAlerta();
+                await alertaError('Error de Autenticación', resultado.error || 'Error al iniciar sesión');
             }
         } catch (error) {
             console.error('Error inesperado en login:', error);
-            mostrarError('Error inesperado. Por favor, intenta de nuevo.');
-        } finally {
-            // Restaurar el botón al estado original
-            submitBtn.textContent = textoOriginal;
-            submitBtn.disabled = false;
+            cerrarAlerta();
+            await alertaError('Error Inesperado', 'Error inesperado. Por favor, intenta de nuevo.');
         }
     });
 

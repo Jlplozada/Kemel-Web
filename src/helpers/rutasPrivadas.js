@@ -1,5 +1,6 @@
 import { Autenticado, getData, refreshNewToken, clearAuth } from './auth.js';
 import { puedeAccederPorRol, cargarHeaderSegunRol } from './gestionRoles.js';
+import { alertaError } from './alertas.js';
 
 // Función para verificar si un token necesita ser renovado
 // Verifica si está próximo a vencer (menos de 2 minutos)
@@ -29,7 +30,7 @@ const tokenNeedRefresh = (token) => {
 
 // Función para mostrar mensaje de acceso denegado
 const mostrarMensajeAccesoDenegado = async () => {
-    alert('No tienes permisos para acceder a esta página.');
+    await alertaError('Acceso Denegado', 'No tienes permisos para acceder a esta página.');
     
     // Redirigir a una página permitida según el rol
     const { redirigirSegunRol } = await import('./gestionRoles.js');

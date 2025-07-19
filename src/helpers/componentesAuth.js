@@ -1,5 +1,6 @@
 import { clearAuth, getUsuario } from './auth.js';
 import { logout } from './api.js';
+import { alertaConfirmacion } from './alertas.js';
 
 // Función simple para agregar un botón de cerrar sesión a cualquier vista
 export const agregarBotonCerrarSesion = (contenedor) => {
@@ -32,7 +33,14 @@ export const agregarBotonCerrarSesion = (contenedor) => {
     // Acción al hacer clic
     botonLogout.addEventListener('click', async () => {
         // Confirmar antes de cerrar sesión
-        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        const resultado = await alertaConfirmacion(
+            '¿Cerrar Sesión?', 
+            '¿Estás seguro de que quieres cerrar sesión?',
+            'Sí, cerrar sesión',
+            'Cancelar'
+        );
+        
+        if (resultado.isConfirmed) {
             console.log("Cerrando sesión...");
             
             // Cambiar texto del botón mientras procesa

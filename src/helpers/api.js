@@ -1,108 +1,58 @@
-import { getData, setData, clearAuth, tokenNearExpiry } from './auth.js';
+import { getData, setData, clearAuth } from './auth.js';
 
 export const API_URL = "http://localhost:5010";
 
-// Función para hacer refresh del token automáticamente
-export const refreshAccessToken = async () => {
-  try {
-    const { refreshToken } = getData();
-    
-    if (!refreshToken) {
-      throw new Error('No hay refresh token disponible');
-    }
-
-    const response = await fetch(`${API_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken })
-    });
-
-    const data = await response.json();
-    
-    if (response.ok && data.success) {
-      // Actualizar tokens
-      setData({
-        accessToken: data.data.token,
-        refreshToken: data.data.refreshToken
-      });
-      return { success: true, token: data.data.token };
-    } else {
-      // Si el refresh token es inválido, limpiar todo
-      clearAuth();
-      return { success: false, error: data.message || 'Error al refrescar token' };
-    }
-  } catch (error) {
-    console.error('Error al refrescar token:', error);
-    clearAuth();
-    return { success: false, error: 'Error de conexión al refrescar token' };
-  }
-};
-
-// Función para hacer peticiones autenticadas con manejo automático de tokens
+// Función para hacer peticiones autenticadas
 export const authenticatedRequest = async (url, options = {}) => {
-  let { accessToken } = getData();
+  const { token } = getData();
   
-  // Verificar si el token necesita ser refrescado
-  if (accessToken && tokenNearExpiry(accessToken)) {
-    console.log('Token próximo a expirar, refrescando...');
-    const refreshResult = await refreshAccessToken();
-    
-    if (refreshResult.success) {
-      accessToken = refreshResult.token;
-    } else {
-      throw new Error('No se pudo refrescar el token');
-    }
+  console.log('=== DEBUG AUTHENTICATED REQUEST ===');
+  console.log('Token obtenido de localStorage:', token);
+  console.log('Token length:', token ? token.length : 0);
+  
+  if (!token) {
+    console.log('No hay token disponible');
+    return { success: false, error: 'No hay token de autenticación' };
   }
 
-  // Configurar headers de autorización
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers
+  const defaultOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      ...options.headers
+    },
+    ...options
   };
 
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`;
-  }
+  console.log('Headers que se enviarán:', defaultOptions.headers);
 
-  // Hacer la petición
-  const response = await fetch(url, {
-    ...options,
-    headers
-  });
-
-  // Si obtenemos 401, intentar refrescar token una vez más
-  if (response.status === 401 && accessToken) {
-    console.log('Token inválido, intentando refrescar...');
-    const refreshResult = await refreshAccessToken();
+  try {
+    const response = await fetch(url, defaultOptions);
     
-    if (refreshResult.success) {
-      // Reintentar la petición con el nuevo token
-      headers.Authorization = `Bearer ${refreshResult.token}`;
-      return await fetch(url, {
-        ...options,
-        headers
-      });
-    } else {
-      // Si no se puede refrescar, limpiar datos y devolver error
+    if (response.status === 401) {
+      console.log('Respuesta 401 - Token expirado o inválido');
+      // Token expirado o inválido, limpiar autenticación
       clearAuth();
-      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      return { success: false, error: 'Sesión expirada' };
     }
-  }
 
-  return response;
+    const data = await response.json();
+    return { success: response.ok, data, status: response.status };
+  } catch (error) {
+    console.error('Error en petición autenticada:', error);
+    return { success: false, error: 'Error de conexión' };
+  }
 };
 
 // Función para hacer login
-export const loginUsuario = async (email, clave) => {
+export const loginUsuario = async (usuario, clave) => {
   try {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, clave })
+      body: JSON.stringify({ usuario, clave })
     });
 
     const data = await response.json();
@@ -111,8 +61,7 @@ export const loginUsuario = async (email, clave) => {
       return { 
         success: true, 
         data: {
-          token: data.data.token,
-          refreshToken: data.data.refreshToken,
+          token: data.data.token, // Solo un token
           usuario: data.data.usuario
         }
       };
@@ -120,8 +69,8 @@ export const loginUsuario = async (email, clave) => {
       return { success: false, error: data.message || 'Error en el login' };
     }
   } catch (error) {
-    console.error('Error de conexión:', error);
-    return { success: false, error: 'No se pudo conectar con el servidor' };
+    console.error('Error en login:', error);
+    return { success: false, error: 'Error de conexión' };
   }
 };
 
@@ -169,15 +118,15 @@ export const obtenerCiudades = async () => {
 // Función para logout
 export const logout = async () => {
   try {
-    const { refreshToken } = getData();
+    const { token } = getData();
     
-    if (refreshToken) {
+    if (token) {
       await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ refreshToken })
+        body: JSON.stringify({ token })
       });
     }
   } catch (error) {
@@ -191,13 +140,12 @@ export const logout = async () => {
 // Función para obtener perfil del usuario
 export const obtenerPerfil = async () => {
   try {
-    const response = await authenticatedRequest(`${API_URL}/usuarios/perfil`);
-    const data = await response.json();
+    const result = await authenticatedRequest(`${API_URL}/usuarios/perfil`);
     
-    if (response.ok && data.success) {
-      return { success: true, data: data.data };
+    if (result.success) {
+      return { success: true, data: result.data };
     } else {
-      return { success: false, error: data.message || 'Error al obtener perfil' };
+      return { success: false, error: result.error || 'Error al obtener perfil' };
     }
   } catch (error) {
     console.error('Error al obtener perfil:', error);
@@ -208,17 +156,15 @@ export const obtenerPerfil = async () => {
 // Función para actualizar perfil del usuario
 export const actualizarPerfil = async (datosActualizados) => {
   try {
-    const response = await authenticatedRequest(`${API_URL}/usuarios/perfil`, {
+    const result = await authenticatedRequest(`${API_URL}/usuarios/perfil`, {
       method: 'PUT',
       body: JSON.stringify(datosActualizados)
     });
     
-    const data = await response.json();
-    
-    if (response.ok && data.success) {
-      return { success: true, data };
+    if (result.success) {
+      return { success: true, data: result.data };
     } else {
-      return { success: false, error: data.message || 'Error al actualizar perfil' };
+      return { success: false, error: result.error || 'Error al actualizar perfil' };
     }
   } catch (error) {
     console.error('Error al actualizar perfil:', error);
@@ -231,13 +177,12 @@ export const actualizarPerfil = async (datosActualizados) => {
 // Obtener todos los usuarios (admin)
 export const obtenerTodosUsuarios = async () => {
   try {
-    const response = await authenticatedRequest(`${API_URL}/usuarios/admin/todos`);
-    const data = await response.json();
+    const result = await authenticatedRequest(`${API_URL}/usuarios/admin/todos`);
     
-    if (response.ok) {
-      return { success: true, data };
+    if (result.success) {
+      return { success: true, data: result.data };
     } else {
-      return { success: false, error: data.error || 'Error al obtener usuarios' };
+      return { success: false, error: result.error || 'Error al obtener usuarios' };
     }
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
@@ -248,13 +193,12 @@ export const obtenerTodosUsuarios = async () => {
 // Obtener usuario por ID (admin)
 export const obtenerUsuarioPorId = async (id) => {
   try {
-    const response = await authenticatedRequest(`${API_URL}/usuarios/admin/${id}`);
-    const data = await response.json();
+    const result = await authenticatedRequest(`${API_URL}/usuarios/admin/${id}`);
     
-    if (response.ok) {
-      return { success: true, data };
+    if (result.success) {
+      return { success: true, data: result.data };
     } else {
-      return { success: false, error: data.error || 'Error al obtener usuario' };
+      return { success: false, error: result.error || 'Error al obtener usuario' };
     }
   } catch (error) {
     console.error('Error al obtener usuario:', error);
@@ -265,17 +209,15 @@ export const obtenerUsuarioPorId = async (id) => {
 // Actualizar usuario (admin)
 export const actualizarUsuarioAdmin = async (id, datosActualizados) => {
   try {
-    const response = await authenticatedRequest(`${API_URL}/usuarios/admin/${id}`, {
+    const result = await authenticatedRequest(`${API_URL}/usuarios/admin/${id}`, {
       method: 'PUT',
       body: JSON.stringify(datosActualizados)
     });
     
-    const data = await response.json();
-    
-    if (response.ok) {
-      return { success: true, message: data.message };
+    if (result.success) {
+      return { success: true, message: result.data.message };
     } else {
-      return { success: false, error: data.error || 'Error al actualizar usuario' };
+      return { success: false, error: result.error || 'Error al actualizar usuario' };
     }
   } catch (error) {
     console.error('Error al actualizar usuario:', error);
@@ -286,16 +228,14 @@ export const actualizarUsuarioAdmin = async (id, datosActualizados) => {
 // Eliminar usuario (admin)
 export const eliminarUsuario = async (id) => {
   try {
-    const response = await authenticatedRequest(`${API_URL}/usuarios/admin/${id}`, {
+    const result = await authenticatedRequest(`${API_URL}/usuarios/admin/${id}`, {
       method: 'DELETE'
     });
     
-    const data = await response.json();
-    
-    if (response.ok) {
-      return { success: true, message: data.message };
+    if (result.success) {
+      return { success: true, message: result.data.message };
     } else {
-      return { success: false, error: data.error || 'Error al eliminar usuario' };
+      return { success: false, error: result.error || 'Error al eliminar usuario' };
     }
   } catch (error) {
     console.error('Error al eliminar usuario:', error);
@@ -306,16 +246,14 @@ export const eliminarUsuario = async (id) => {
 // Restaurar usuario (admin)
 export const restaurarUsuario = async (id) => {
   try {
-    const response = await authenticatedRequest(`${API_URL}/usuarios/admin/${id}/restaurar`, {
+    const result = await authenticatedRequest(`${API_URL}/usuarios/admin/${id}/restaurar`, {
       method: 'PATCH'
     });
     
-    const data = await response.json();
-    
-    if (response.ok) {
-      return { success: true, message: data.message };
+    if (result.success) {
+      return { success: true, message: result.data.message };
     } else {
-      return { success: false, error: data.error || 'Error al restaurar usuario' };
+      return { success: false, error: result.error || 'Error al restaurar usuario' };
     }
   } catch (error) {
     console.error('Error al restaurar usuario:', error);
@@ -326,17 +264,15 @@ export const restaurarUsuario = async (id) => {
 // Crear nuevo usuario (admin)
 export const crearUsuarioAdmin = async (datosUsuario) => {
   try {
-    const response = await authenticatedRequest(`${API_URL}/usuarios/admin/crear`, {
+    const result = await authenticatedRequest(`${API_URL}/usuarios/admin/crear`, {
       method: 'POST',
       body: JSON.stringify(datosUsuario)
     });
     
-    const data = await response.json();
-    
-    if (response.ok) {
-      return { success: true, message: data.message, id: data.id };
+    if (result.success) {
+      return { success: true, message: result.data.message, id: result.data.id };
     } else {
-      return { success: false, error: data.error || 'Error al crear usuario' };
+      return { success: false, error: result.error || 'Error al crear usuario' };
     }
   } catch (error) {
     console.error('Error al crear usuario:', error);

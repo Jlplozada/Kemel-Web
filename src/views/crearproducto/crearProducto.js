@@ -1,4 +1,5 @@
 import { API_URL } from '../../helpers/api.js';
+import { alertaExito, alertaError, alertaConfirmacion, alertaLoading, cerrarAlerta, toast } from '../../helpers/alertas.js';
 
 class CrearProductoControlador {
     constructor() {
@@ -150,8 +151,8 @@ class CrearProductoControlador {
             return;
         }
 
-        this.setLoading(true);
-        this.hideMessage();
+        // Mostrar loading
+        alertaLoading('Creando Producto', 'Por favor espera mientras se crea el producto...');
 
         try {
             const formData = new FormData(this.form);
@@ -174,25 +175,31 @@ class CrearProductoControlador {
             // Crear producto
             const result = await this.createProduct(productData);
             
-            this.showMessage('Producto creado exitosamente', 'exito');
-            this.resetForm();
+            // Cerrar loading y mostrar éxito
+            cerrarAlerta();
+            await alertaExito('¡Producto Creado!', 'El producto se ha creado exitosamente');
             
-            // Redirigir después de 2 segundos
-            setTimeout(() => {
-                window.location.hash = '#/productos';
-            }, 2000);
+            this.resetForm();
+            window.location.hash = '#/productos';
 
         } catch (error) {
             console.error('Error:', error);
-            this.showMessage(error.message || 'Error al crear el producto', 'error');
-        } finally {
-            this.setLoading(false);
+            // Cerrar loading y mostrar error
+            cerrarAlerta();
+            await alertaError('Error al Crear Producto', error.message || 'No se pudo crear el producto');
         }
     }
 
-    handleCancel() {
+    async handleCancel() {
         if (this.hasChanges()) {
-            if (confirm('¿Estás seguro de que quieres cancelar? Se perderán todos los cambios.')) {
+            const resultado = await alertaConfirmacion(
+                '¿Cancelar creación?',
+                '¿Estás seguro de que quieres cancelar? Se perderán todos los cambios.',
+                'Sí, cancelar',
+                'Continuar editando'
+            );
+            
+            if (resultado.isConfirmed) {
                 window.location.hash = '#/productos';
             }
         } else {

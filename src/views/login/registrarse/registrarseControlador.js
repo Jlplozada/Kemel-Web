@@ -1,5 +1,6 @@
 
 import { registrarUsuario, obtenerCiudades } from '../../../helpers/api.js';
+import { alertaError, alertaExito, alertaLoading, cerrarAlerta, toast } from '../../../helpers/alertas.js';
 
 export function registrarseControlador() {
   console.log("registrarseControlador ejecutado");
@@ -109,12 +110,8 @@ function validarFormulario(form) {
 
 // Función para procesar el registro
 async function procesarRegistro(form) {
-  const submitBtn = form.querySelector('button[type="submit"]');
-  const textoOriginal = submitBtn.textContent;
-  
-  // Mostrar estado de carga
-  submitBtn.textContent = 'Registrando...';
-  submitBtn.disabled = true;
+  // Mostrar loading
+  alertaLoading('Registrando Usuario', 'Creando tu cuenta...');
 
   try {
     // Preparar datos para enviar
@@ -132,26 +129,23 @@ async function procesarRegistro(form) {
     
     if (resultado.success) {
       // Registro exitoso
-      mostrarExitoGeneral("¡Registro exitoso! Puedes iniciar sesión ahora.");
+      cerrarAlerta();
+      await alertaExito('¡Registro Exitoso!', '¡Tu cuenta ha sido creada! Puedes iniciar sesión ahora.');
       form.reset();
       
-      // Redirigir al login después de un breve delay
-      setTimeout(() => {
-        window.navigate ? window.navigate('login') : window.location.hash = '#/login';
-      }, 2000);
+      // Redirigir al login
+      window.navigate ? window.navigate('login') : window.location.hash = '#/login';
       
     } else {
       // Error en el registro
-      mostrarError("error-general", resultado.error);
+      cerrarAlerta();
+      await alertaError('Error en el Registro', resultado.error);
     }
     
   } catch (error) {
     console.error('Error inesperado:', error);
-    mostrarError("error-general", "Error inesperado. Por favor, intenta de nuevo.");
-  } finally {
-    // Restaurar el botón
-    submitBtn.textContent = textoOriginal;
-    submitBtn.disabled = false;
+    cerrarAlerta();
+    await alertaError('Error Inesperado', 'Error inesperado. Por favor, intenta de nuevo.');
   }
 }
 

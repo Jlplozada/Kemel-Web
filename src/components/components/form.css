@@ -1,28 +1,46 @@
 /* Estilo para el select del formulario de registro */
 .form-group select {
-  padding: 0.7rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  outline: none;
+  padding: 8px;
+  border: 1px solid #ccc !important;
+  font-size: 14px;
   background: #fff;
-  color: #222;
-  transition: border 0.2s;
-  margin-top: 0.2rem;
+  color: #333;
+  outline: none;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 .form-group select:focus {
-  border-color: #67072a;
+  border-color: #ccc !important;
+  box-shadow: none !important;
+}
+.form-group select:valid {
+  border-color: #ccc !important;
+  box-shadow: none !important;
+}
+.form-group select:invalid {
+  border-color: #ccc !important;
+  box-shadow: none !important;
+}
+
+/* Eliminar estilos de validación del navegador */
+input:invalid,
+input:valid,
+select:invalid,
+select:valid,
+textarea:invalid,
+textarea:valid {
+  border: 1px solid #ccc !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 .form-group option {
-  color: #222;
+  color: #333;
   background: #fff;
 }
 body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
   padding-top: 60px;
 }
 /* --- Estilos para el formulario de login --- */
@@ -30,80 +48,87 @@ body {
   max-width: 350px;
   margin: 120px auto 40px auto;
   background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
-  padding: 2rem 2.5rem 1.5rem 2.5rem;
+  border: 1px solid #ccc;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
 .form-login h2 {
   text-align: center;
-  color: #67072a;
-  margin-bottom: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
 }
 .form-group {
-  margin-bottom: 1.2rem;
+  margin-bottom: 15px;
   display: flex;
   flex-direction: column;
 }
 .form-group label {
-  font-weight: 500;
-  margin-bottom: 0.4rem;
-  color: #67072a;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
 }
 .form-group input {
-  padding: 0.7rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  font-size: 1rem;
+  padding: 8px;
+  border: 1px solid #ccc !important;
+  font-size: 14px;
   outline: none;
-  transition: border 0.2s;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 .form-group input:focus {
-  border-color: #67072a;
+  border-color: #ccc !important;
+  box-shadow: none !important;
+}
+.form-group input:valid {
+  border-color: #ccc !important;
+  box-shadow: none !important;
+}
+.form-group input:invalid {
+  border-color: #ccc !important;
+  box-shadow: none !important;
+}
+.form-group input:required {
+  border-color: #ccc !important;
+  box-shadow: none !important;
 }
 .form-btn {
-  background: #67072a;
-  color: #fff;
+  background: #333;
+  color: white;
   border: none;
-  border-radius: 0.5rem;
-  padding: 0.8rem 0;
-  font-size: 1.1rem;
-  font-weight: bold;
+  padding: 10px;
+  font-size: 16px;
   cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background 0.2s;
+  margin-top: 10px;
+  border-radius: 0;
 }
 .form-btn:hover {
-  background: #a0134a;
+  background: #555;
 }
 .form-links {
   text-align: center;
-  margin-top: 1.2rem;
+  margin-top: 15px;
 }
 .form-links a {
-  color: #67072a;
+  color: #333;
   text-decoration: underline;
-  font-size: 0.98rem;
 }
 /*
-  Barra de navegación principal, fija en la parte superior, con fondo y sombra.
-  Usa grid para organizar el logo y el menú.
+  Barra de navegación principal, fija en la parte superior, con fondo.
 */
 .header {
   background-color: var(--segundo-color);
   color: var(--text2-color);
   padding: 5px 32px; 
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
   position: fixed;  
   top: 0;
   left: 0;
   width: 100%;
   z-index: 1000;        
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /*
@@ -114,38 +139,19 @@ body {
 }
 
 /*
-  Menú de navegación: muestra los enlaces en una fila y los alinea a la derecha.
+  Menú de navegación: muestra los enlaces en una fila.
 */
 .nav-menu {
-  display: grid;
-  grid-auto-flow: column;
-  gap: 20px;
-  justify-content: end;
+  float: right;
   padding-right: 16px; 
 }
 
 /*
-  Estilo de los enlaces del menú: color, sin subrayado, animación de subrayado al hover.
+  Estilo de los enlaces del menú: color, sin subrayado.
 */
 .nav-menu a {
   color: var(--text2-color);
   text-decoration: none;
-  position: relative;
-  transition: color 0.3s;
-}
-
-/*
-  Línea animada que aparece debajo del enlace al hacer hover.
-*/
-.nav-menu a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -3px;
-  width: 0;
-  height: 2px;
-  background: var(--primer-color);
-  transition: width 0.3s;
 }
 
 /*
@@ -157,33 +163,21 @@ body {
 }
 
 /*
-  Anima la línea debajo del enlace al hacer hover o focus.
-*/
-.nav-menu a:hover::after,
-.nav-menu a:focus::after {
-  width: 100%;
-}
-
-/*
-  Contenedor del logo, lo alinea verticalmente.
+  Contenedor del logo.
 */
 .nav-logo {
-  display: inline-block;
-  vertical-align: middle;
+  float: left;
 }
 
 /*
   Ajusta el tamaño del logo.
 */
 .nav-logo img {
-  display: block;
-  width: 20vh;
-  max-height: 10vh;
+  width: 150px;
+  height: 50px;
 }
 /*
   Estilos responsivos para móviles (pantallas <= 600px):
-  - El header se adapta a una sola columna y centra el contenido.
-  - El logo y menú cambian de tamaño y disposición.
 */
 @media (max-width: 600px) {
   .header {
@@ -245,10 +239,8 @@ body {
     align-items: stretch;        
     gap: 0;
     z-index: 2000;
-    box-shadow: none;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s cubic-bezier(.4,0,.2,1);
   }
   .nav-menu.activo {
     display: flex;
@@ -258,17 +250,16 @@ body {
   .nav-menu a {
     font-size: 2em;
     padding: 20px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid #ccc;
     background: none;
     width: 100%;
     text-align: center;
-    transition: background 0.2s;
   }
   .nav-menu a:last-child {
     border-bottom: none;
   }
   .nav-menu a:hover {
-    background: rgba(255,255,255,0.07);
+    background: #eee;
   }
   .menu-hamburguesa {
     display: flex;
@@ -276,96 +267,64 @@ body {
     right: 10px;
     top: 10px;
     z-index: 2100;
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px;
-    transition: background 0.2s;
+    background: #ccc;
   }
 }
 
 /* --- Estilos para mensajes de error y éxito --- */
 .error {
-  color: #c33;
-  font-size: 0.85rem;
-  margin-top: 0.3rem;
-  display: block;
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
 }
 
 .mensaje-error {
-  background-color: #fee;
-  color: #c33;
+  background-color: pink;
+  color: red;
   padding: 10px;
-  border-radius: 4px;
   margin-bottom: 15px;
-  border: 1px solid #fcc;
+  border: 1px solid red;
   text-align: center;
 }
 
 .mensaje-exito {
-  background-color: #efe;
-  color: #3c3;
+  background-color: lightgreen;
+  color: green;
   padding: 10px;
-  border-radius: 4px;
   margin-bottom: 15px;
-  border: 1px solid #cfc;
+  border: 1px solid green;
   text-align: center;
 }
 
 .mensaje-general {
-  background-color: #efe;
-  color: #3c3;
+  background-color: lightgreen;
+  color: green;
   padding: 15px;
-  border-radius: 4px;
   margin-bottom: 20px;
-  border: 1px solid #cfc;
+  border: 1px solid green;
   text-align: center;
   font-weight: bold;
 }
 
 /* --- Estilos para checkboxes --- */
 .checkbox-group {
-  margin-bottom: 1rem;
+  margin-bottom: 15px;
 }
 
 .checkbox-label {
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-size: 0.9rem;
-  color: #555;
-  gap: 0.5rem;
+  font-size: 14px;
+  color: #333;
 }
 
 .checkbox-input {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #ccc;
-  border-radius: 3px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
 }
 
 .checkbox-input:checked {
-  background-color: #67072a;
-  border-color: #67072a;
-}
-
-.checkbox-input:checked::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.checkbox-input:hover {
-  border-color: #67072a;
-}
-
-.checkbox-text {
-  user-select: none;
+  background-color: #333;
 }
