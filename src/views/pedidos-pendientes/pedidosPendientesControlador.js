@@ -6,15 +6,15 @@ export const pedidosPendientesControlador = async () => {
     console.log("Ejecutando pedidosPendientesControlador...");
 
     try {
-        // Cargar pedidos pendientes
+        // Cargar pedidos aprobados (listos para preparar)
         await cargarPedidosPendientes();
     } catch (error) {
         console.error('Error al cargar vista de pedidos pendientes:', error);
-        await alertaError('Error', 'Error al cargar los pedidos pendientes');
+        await alertaError('Error', 'Error al cargar los pedidos aprobados');
     }
 };
 
-// Función para cargar pedidos con estado pendiente
+// Función para cargar pedidos con estado aprobado (listos para preparar)
 const cargarPedidosPendientes = async () => {
     const tbody = document.getElementById('tbody-pedidos-pendientes');
     const mensajeSinPedidos = document.getElementById('mensaje-sin-pedidos');
@@ -22,7 +22,7 @@ const cargarPedidosPendientes = async () => {
     if (!tbody) return;
 
     try {
-        alertaLoading('Cargando', 'Obteniendo pedidos pendientes...');
+        alertaLoading('Cargando', 'Obteniendo pedidos aprobados...');
 
         const { token } = getData();
         const response = await fetch(`${API_URL}/pedidos/pendientes`, {
@@ -72,7 +72,7 @@ const cargarPedidosPendientes = async () => {
                 }
             });
         } else {
-            console.log("=== NO HAY PEDIDOS PENDIENTES ===");
+            console.log("=== NO HAY PEDIDOS APROBADOS ===");
             console.log("Success:", resultado.success);
             console.log("Data length:", resultado.data ? resultado.data.length : "data is null/undefined");
             tbody.innerHTML = '';
@@ -97,6 +97,7 @@ const crearFilaProducto = (pedido, producto, mostrarIdPedido, clasePedido = '') 
     if (producto) {
         fila.innerHTML = `
             <td>${mostrarIdPedido ? pedido.id : ''}</td>
+            <td>${mostrarIdPedido ? obtenerEstadoFormateado(pedido.estado) : ''}</td>
             <td>${producto.cantidad}</td>
             <td>${producto.nombre}</td>
             <td>${mostrarIdPedido ? crearBotonAccion(pedido) : ''}</td>
@@ -105,6 +106,7 @@ const crearFilaProducto = (pedido, producto, mostrarIdPedido, clasePedido = '') 
         // Si no hay producto
         fila.innerHTML = `
             <td>${pedido.id}</td>
+            <td>${obtenerEstadoFormateado(pedido.estado)}</td>
             <td>-</td>
             <td>Sin productos</td>
             <td>${crearBotonAccion(pedido)}</td>
@@ -114,10 +116,28 @@ const crearFilaProducto = (pedido, producto, mostrarIdPedido, clasePedido = '') 
     return fila;
 };
 
-// Función para crear botón de acción - solo cambiar a preparado
+// Función para formatear el estado del pedido como texto simple
+const obtenerEstadoFormateado = (estado) => {
+    switch (estado) {
+        case 'pendiente':
+            return 'Pendiente';
+        case 'aprobado':
+            return 'Aprobado';
+        case 'preparado':
+            return 'Preparado';
+        case 'entregado':
+            return 'Entregado';
+        case 'cancelado':
+            return 'Cancelado';
+        default:
+            return estado;
+    }
+};
+
+// Función para crear botón de acción - solo cambiar de aprobado a preparado
 const crearBotonAccion = (pedido) => {
-    // Solo mostrar botón si el estado es pendiente o aprobado
-    if (pedido.estado === 'pendiente' || pedido.estado === 'aprobado') {
+    // Solo mostrar botón si el estado es aprobado
+    if (pedido.estado === 'aprobado') {
         return `
             <button class="btn-accion btn-preparar" onclick="marcarComoPreparado(${pedido.id})">
                 Marcar Preparado
@@ -129,6 +149,8 @@ const crearBotonAccion = (pedido) => {
         return `<span class="estado-entregado">✓ Entregado</span>`;
     } else if (pedido.estado === 'cancelado') {
         return `<span class="estado-cancelado">✗ Cancelado</span>`;
+    } else if (pedido.estado === 'pendiente') {
+        return `<span class="estado-pendiente">⏳ Pendiente</span>`;
     } else {
         return `<span class="estado-${pedido.estado}">${pedido.estado}</span>`;
     }

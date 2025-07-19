@@ -118,42 +118,14 @@ const crearSelectRol = (rolActual, usuarioId) => {
     return selectHTML;
 };
 
-// Función para crear botones de acción para usuarios
-const crearBotonesAccionUsuario = (usuario) => {
-    return `
-        <select class="select-rol" onchange="cambiarRolUsuario(${usuario.id}, this.value)">
-            <option value="">Cambiar rol</option>
-            <option value="admin" ${usuario.rol === 'admin' ? 'disabled' : ''}>Admin</option>
-            <option value="panaderia" ${usuario.rol === 'panaderia' ? 'disabled' : ''}>Panadero</option>
-            <option value="cliente" ${usuario.rol === 'cliente' ? 'disabled' : ''}>Cliente</option>
-        </select>
-        <button class="btn-accion btn-editar" onclick="editarUsuario(${usuario.id})">
-            Editar
-        </button>
-        <button class="btn-accion btn-eliminar" onclick="eliminarUsuario(${usuario.id})">
-            Eliminar
-        </button>
-    `;
-};
-
 // Configurar controles
 const configurarControles = () => {
     const filtroRol = document.getElementById('filtro-rol');
-    const btnCrearUsuario = document.getElementById('btn-crear-usuario');
-    const btnExportar = document.getElementById('btn-exportar');
 
     if (filtroRol) {
         filtroRol.addEventListener('change', (e) => {
             cargarUsuariosAdmin(e.target.value);
         });
-    }
-
-    if (btnCrearUsuario) {
-        btnCrearUsuario.addEventListener('click', crearNuevoUsuario);
-    }
-
-    if (btnExportar) {
-        btnExportar.addEventListener('click', exportarReporte);
     }
 };
 
@@ -240,27 +212,6 @@ window.eliminarUsuario = async (usuarioId) => {
         cerrarAlerta();
         console.error('Error al eliminar usuario:', error);
         await alertaError('Error', 'Error al eliminar el usuario');
-    }
-};
-
-// Función para crear nuevo usuario
-const crearNuevoUsuario = () => {
-    alertaExito('Crear Usuario', 'Funcionalidad de creación de usuarios en desarrollo');
-};
-
-// Función para exportar reporte
-const exportarReporte = async () => {
-    try {
-        alertaLoading('Exportando', 'Generando reporte de usuarios...');
-        
-        // Simular exportación
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        cerrarAlerta();
-        await alertaExito('¡Éxito!', 'Reporte exportado correctamente');
-    } catch (error) {
-        cerrarAlerta();
-        await alertaError('Error', 'No se pudo exportar el reporte');
     }
 };
 

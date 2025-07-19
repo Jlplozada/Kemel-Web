@@ -163,13 +163,24 @@ export const router = async (app) => {
 
 // Busca la ruta que coincide y extrae los parámetros dinámicos
 const matchRoute = (hash) => {
-    // Búsqueda exacta primero
-    if (routes[hash]) {
-        return [routes[hash], {}];
+    // Separar la ruta base de los parámetros de consulta
+    const [baseRoute, queryString] = hash.split('?');
+    
+    // Búsqueda exacta primero con la ruta base
+    if (routes[baseRoute]) {
+        // Si hay parámetros de consulta, parsearlos
+        const queryParams = {};
+        if (queryString) {
+            const urlParams = new URLSearchParams(queryString);
+            for (const [key, value] of urlParams) {
+                queryParams[key] = value;
+            }
+        }
+        return [routes[baseRoute], queryParams];
     }
     
     // Si no hay coincidencia exacta, buscar con parámetros dinámicos
-    const arreglo = hash.split('/');
+    const arreglo = baseRoute.split('/');
 
     for (const route in routes) {
         const b = route.split('/');
@@ -186,6 +197,13 @@ const matchRoute = (hash) => {
         });
 
         if (matched) {
+            // Agregar también los parámetros de consulta si existen
+            if (queryString) {
+                const urlParams = new URLSearchParams(queryString);
+                for (const [key, value] of urlParams) {
+                    params[key] = value;
+                }
+            }
             return [routes[route], params];
         }
     }

@@ -1,271 +1,34 @@
-/* Estilos comunes para admin-pedidos y admin-usuarios */
-.admin-pedidos-container,
-.admin-usuarios-container {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 2rem;
+/* Importar estilos comunes de tablas */
+@import '../../components/components/tablas.css';
+
+/* Estilos específicos para admin-pedidos */
+.admin-pedidos-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.admin-pedidos-container h2,
-.admin-usuarios-container h2 {
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
+.admin-pedidos-container h2 {
     text-align: center;
-    font-family: var(--font-family);
+    margin-bottom: 20px;
+    color: #333;
 }
 
-.admin-pedidos-container p,
-.admin-usuarios-container p {
+.admin-pedidos-container p {
     text-align: center;
-    color: var(--tercer-color);
-    margin-bottom: 2rem;
-    font-family: var(--font-family);
+    color: #666;
+    margin-bottom: 30px;
 }
 
 .filtros-container {
-    margin-bottom: 2rem;
+    margin-bottom: 20px;
     text-align: center;
-}
-
-.filtros-centrados {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
 }
 
 .filtro-select {
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    background: white;
-    cursor: pointer;
-}
-
-.btn-exportar,
-.btn-crear {
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.btn-exportar:hover,
-.btn-crear:hover {
-    background-color: #0056b3;
-}
-
-.tabla-container {
-    overflow-x: auto;
-}
-
-.tabla-pedidos,
-.tabla-usuarios {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-.tabla-pedidos th,
-.tabla-pedidos td,
-.tabla-usuarios th,
-.tabla-usuarios td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.tabla-pedidos th,
-.tabla-usuarios th {
-    background-color: lightgray;
-    font-weight: bold;
-    color: #333;
-    text-align: center;
-}
-
-.tabla-pedidos td,
-.tabla-usuarios td {
-    text-align: center;
-    border: 1px solid black;
-}
-
-/* Alternar colores por pedido (no por fila) */
-.tabla-pedidos tr.pedido-par {
-    background-color: var(--tercer-color); /* Gris oscuro de la paleta */
-    color: var(--text2-color); /* Texto blanco */
-}
-
-.tabla-pedidos tr.pedido-impar {
-    background-color: var(--primer-color); /* Blanco de la paleta */
-    color: var(--text-color); /* Texto negro */
-}
-
-.btn-accion {
-    padding: 8px 15px;
-    background-color: var(--segundo-color); /* Color vino de la paleta */
-    color: var(--text2-color); /* Texto blanco */
-    border: none;
-    cursor: pointer;
     font-size: 14px;
-    margin: 2px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
-
-.btn-detalles {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-detalles:hover {
-    background-color: #0056b3;
-    transform: translateY(-1px);
-}
-
-.btn-editar {
-    background-color: #ffc107;
-    color: #212529;
-}
-
-.btn-editar:hover {
-    background-color: #e0a800;
-}
-
-.btn-eliminar {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-eliminar:hover {
-    background-color: #c82333;
-}
-
-.select-estado,
-.select-rol,
-.select-estado-admin {
-    padding: 4px 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    margin-bottom: 4px;
-    width: 100px;
-    background: white;
-    cursor: pointer;
-}
-
-.select-estado-admin {
-    width: 120px;
-    font-size: 12px;
-    padding: 6px;
-    border: 1px solid var(--tercer-color);
-    border-radius: 4px;
-    background: var(--primer-color);
-    color: var(--text-color);
-}
-
-/* Select dentro de filas con fondo oscuro */
-.pedido-par .select-estado-admin {
-    background: var(--primer-color);
-    color: var(--text-color);
-    border: 1px solid var(--primer-color);
-}
-
-/* Estados de pedidos */
-.estado-pendiente {
-    color: #dc3545;
-    font-weight: 600;
-}
-
-.estado-aprobado {
-    color: #28a745;
-    font-weight: 600;
-}
-
-.estado-preparado {
-    color: #ffc107;
-    font-weight: 600;
-}
-
-.estado-entregado {
-    color: #007bff;
-    font-weight: 600;
-}
-
-.estado-cancelado {
-    color: #6c757d;
-    font-weight: 600;
-}
-
-/* Roles de usuarios */
-.rol-admin {
-    color: #dc3545;
-    font-weight: 600;
-    background-color: #f8d7da;
-    padding: 2px 6px;
-    border-radius: 3px;
-}
-
-.rol-panaderia {
-    color: #856404;
-    font-weight: 600;
-    background-color: #fff3cd;
-    padding: 2px 6px;
-    border-radius: 3px;
-}
-
-.rol-cliente {
-    color: #155724;
-    font-weight: 600;
-    background-color: #d4edda;
-    padding: 2px 6px;
-    border-radius: 3px;
-}
-
-.mensaje-vacio {
-    text-align: center;
-    padding: 3rem;
-    color: #666;
-}
-
-.productos-lista {
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-    .admin-pedidos-container,
-    .admin-usuarios-container {
-        margin: 1rem;
-        padding: 1rem;
-    }
-    
-    .filtros-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .tabla-pedidos,
-    .tabla-usuarios {
-        font-size: 0.875rem;
-    }
-    
-    .tabla-pedidos th,
-    .tabla-pedidos td,
-    .tabla-usuarios th,
-    .tabla-usuarios td {
-        padding: 8px;
-    }
-    
-    .btn-accion {
-        padding: 2px 6px;
-        font-size: 0.7rem;
-    }
 }

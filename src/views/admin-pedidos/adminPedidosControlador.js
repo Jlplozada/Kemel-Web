@@ -110,6 +110,8 @@ const crearFilaProductoAdmin = (pedido, producto, mostrarDatosPedido, clasePedid
         fila.innerHTML = `
             <td>${mostrarDatosPedido ? pedido.id : ''}</td>
             <td>${mostrarDatosPedido ? (pedido.nombre_usuario || 'Cliente') : ''}</td>
+            <td>${mostrarDatosPedido ? (pedido.telefono_usuario || 'Sin teléfono') : ''}</td>
+            <td>${mostrarDatosPedido ? (pedido.nombre || 'Sin nombre') : ''}</td>
             <td>${mostrarDatosPedido ? fecha : ''}</td>
             <td>${mostrarDatosPedido ? crearSelectEstado(pedido) : ''}</td>
             <td>${mostrarDatosPedido ? (pedido.direccion_entrega || 'Sin dirección') : ''}</td>
@@ -122,6 +124,8 @@ const crearFilaProductoAdmin = (pedido, producto, mostrarDatosPedido, clasePedid
         fila.innerHTML = `
             <td>${pedido.id}</td>
             <td>${pedido.nombre_usuario || 'Cliente'}</td>
+            <td>${pedido.telefono_usuario || 'Sin teléfono'}</td>
+            <td>${pedido.nombre || 'Sin nombre'}</td>
             <td>${fecha}</td>
             <td>${crearSelectEstado(pedido)}</td>
             <td>${pedido.direccion_entrega || 'Sin dirección'}</td>
@@ -153,9 +157,6 @@ const crearSelectEstado = (pedido) => {
 // Función para crear botones de acción para admin
 const crearBotonesAccionAdmin = (pedido) => {
     return `
-        <button class="btn-accion btn-detalles" onclick="verDetallesPedido(${pedido.id})">
-            Detalles
-        </button>
         <button class="btn-accion btn-eliminar" onclick="eliminarPedido(${pedido.id})">
             Eliminar
         </button>
@@ -165,16 +166,11 @@ const crearBotonesAccionAdmin = (pedido) => {
 // Configurar filtros
 const configurarFiltros = () => {
     const filtroEstado = document.getElementById('filtro-estado');
-    const btnExportar = document.getElementById('btn-exportar');
 
     if (filtroEstado) {
         filtroEstado.addEventListener('change', (e) => {
             cargarPedidosAdmin(e.target.value);
         });
-    }
-
-    if (btnExportar) {
-        btnExportar.addEventListener('click', exportarReporte);
     }
 };
 
@@ -247,16 +243,4 @@ window.eliminarPedido = async (pedidoId) => {
         console.error('Error al eliminar pedido:', error);
         await alertaError('Error', 'Error al eliminar el pedido');
     }
-};
-
-// Función global para ver detalles del pedido
-window.verDetallesPedido = (pedidoId) => {
-    // Navegar a la vista de detalles con el ID del pedido
-    window.location.hash = `detalle-pedido?id=${pedidoId}`;
-};
-
-// Función para exportar reporte
-const exportarReporte = () => {
-    // Por ahora solo mostrar mensaje, implementar según necesidades
-    alertaExito('Función de Exportación', 'Funcionalidad de exportación en desarrollo');
 };
